@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 public class EscuelaDto {
 
 	private Long id;
@@ -11,6 +14,7 @@ public class EscuelaDto {
 	@NotBlank
 	private String nombre;
 
+	@JsonInclude(Include.NON_NULL)
 	private List<SectorDto> sectores;
 
 	public Long getId() {

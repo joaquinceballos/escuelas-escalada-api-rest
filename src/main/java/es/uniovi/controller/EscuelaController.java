@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
+import es.uniovi.domain.Via;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
 
@@ -45,7 +47,7 @@ public class EscuelaController extends BaseController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<List<SectorDto>> getSectores(
 			@PathVariable(name = "id") @NotNull Long id) throws ServiceException {
-		return new ApiResponse<>(toDto(escuelaService.getSectores(id)), ApiResponseStatus.SUCCESS);
+		return new ApiResponse<>(toSectoresDto(escuelaService.getSectores(id)), ApiResponseStatus.SUCCESS);
 	}
 
 	@PostMapping("/{id}/sector")
@@ -54,6 +56,33 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "id") @NotNull Long id,
 	        @Valid @RequestBody SectorDto sectorDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addSector(id, toEntity(sectorDto))), ApiResponseStatus.SUCCESS);
+	}
+	
+	@GetMapping("/{idEscuela}/sector/{idSector}/via")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<List<ViaDto>> getVias(
+			@PathVariable(name = "idEscuela") Long idEscuela,
+			@PathVariable(name = "idSector") Long idSector) throws ServiceException {
+		return new ApiResponse<>(toViasDto(escuelaService.getVias(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
+	}
+	
+	@GetMapping("/{idEscuela}/sector/{idSector}/via/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ViaDto> getVia(
+			@PathVariable(name = "idEscuela") Long idEscuela,
+			@PathVariable(name = "idSector") Long idSector,
+			@PathVariable(name = "idVia") Long idVia) throws ServiceException {
+		return new ApiResponse<>(toDto(escuelaService.getVia(idEscuela, idSector, idVia)), ApiResponseStatus.SUCCESS);
+	}
+
+	@PostMapping("/{idEscuela}/sector/{idSector}/via")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public ApiResponse<ViaDto> addVia(
+			@PathVariable(name = "idEscuela") Long idEscuela,
+			@PathVariable(name = "idSector") Long idSector,
+			@RequestBody @Valid ViaDto viaDto) throws ServiceException {
+		Via nuevaVia = escuelaService.addVia(idEscuela, idSector, toEntity(viaDto));
+		return new ApiResponse<>(toDto(nuevaVia), ApiResponseStatus.SUCCESS);
 	}
 
 }

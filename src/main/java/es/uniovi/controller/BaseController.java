@@ -10,19 +10,25 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
+import es.uniovi.domain.Via;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 
@@ -80,6 +86,29 @@ public abstract class BaseController {
 		errors.put("valor", e.getValor());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	protected ApiResponse<Map<String, Object>> handleException(MethodArgumentTypeMismatchException e) {
+		Map<String, Object> errors = new HashMap<>();
+		errors.put("parámetro", e.getParameter().getParameterName());
+		errors.put("valor pasado", e.getValue());
+		errors.put("tipo esperado", e.getParameter().getParameterType().getSimpleName());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	protected ApiResponse<Map<String, Object>> handleException(HttpMessageNotReadableException e){
+		Map<String, Object> errors = new HashMap<>();
+		if (e.getCause() instanceof InvalidFormatException) {
+			InvalidFormatException invalidFormatException = (InvalidFormatException) e.getCause();
+			errors.put("campo", invalidFormatException.getPath().get(0).getFieldName());
+			errors.put("tipo esperado", invalidFormatException.getTargetType().getSimpleName());
+			errors.put("valor pasado", invalidFormatException.getValue());			
+		}
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
 
 	///////////////////////////////
 	////// mapeo DTO-Entity ///////
@@ -93,7 +122,7 @@ public abstract class BaseController {
 		return modelMapper.map(escuela, EscuelaDto.class);
 	}
 
-	protected List<SectorDto> toDto(List<Sector> sectores) {
+	protected List<SectorDto> toSectoresDto(List<Sector> sectores) {
 		return sectores.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
@@ -103,5 +132,17 @@ public abstract class BaseController {
 
 	protected Sector toEntity(SectorDto sectorDto) {
 		return modelMapper.map(sectorDto, Sector.class);
+	}
+	
+	protected ViaDto toDto(Via via) {
+		return modelMapper.map(via, ViaDto.class);
+	}
+	
+	protected Via toEntity(ViaDto viaDto ) {
+		return modelMapper.map(viaDto, Via.class);
+	}
+	
+	protected List<ViaDto> toViasDto(List<Via> vias) {
+		return vias.stream().map(this::toDto).collect(Collectors.toList());
 	}
 }
