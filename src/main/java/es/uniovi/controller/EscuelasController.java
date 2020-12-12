@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.domain.Escuela;
+import es.uniovi.dto.EscuelaDto;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
 
 @RestController
 @RequestMapping("escuela")
-public class EscuelasController implements BaseController {
+public class EscuelasController extends BaseController {
 
 	@Autowired
 	private EscuelaService escuelaService;
@@ -32,8 +33,8 @@ public class EscuelasController implements BaseController {
 
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ApiResponse<Escuela> addEscuela(@Valid @RequestBody Escuela escuela) throws ServiceException {
-		return new ApiResponse<>(escuelaService.addEscuela(escuela), ApiResponseStatus.SUCCESS);
+	public ApiResponse<EscuelaDto> addEscuela(@Valid @RequestBody EscuelaDto escuelaDto) throws ServiceException {
+		return new ApiResponse<>(toDto(escuelaService.addEscuela(toEntity(escuelaDto))), ApiResponseStatus.SUCCESS);
 	}
 
 }
