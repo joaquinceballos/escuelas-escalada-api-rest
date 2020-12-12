@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"NOMBRE"}, name = "UK_ESCUELA_NOMBRE")})
@@ -16,6 +17,7 @@ public class Escuela {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
+	@NotBlank
 	@Column(nullable = false)
 	private String nombre;
 
