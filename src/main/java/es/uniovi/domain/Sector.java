@@ -1,34 +1,35 @@
 package es.uniovi.domain;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 
+import es.uniovi.validation.Coordenadas;
+
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
-public class Escuela {
+@Coordenadas
+public class Sector implements Ubicable {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@NotBlank
-	@Column(nullable = false)
 	private String nombre;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "escuela")
-	private List<Sector> sectores;
+	private Double latitud;
 
-	public Escuela() {
+	private Double longitud;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_SECTOR_ESCUELA"))
+	private Escuela escuela;
+
+	public Sector() {
 		super();
 	}
 
@@ -48,13 +49,29 @@ public class Escuela {
 		this.nombre = nombre;
 	}
 
-	public List<Sector> getSectores() {
-		return sectores;
+	public Double getLatitud() {
+		return latitud;
 	}
 
-	public void setSectores(List<Sector> sectores) {
-		this.sectores = sectores;
-	}	
+	public void setLatitud(Double latitud) {
+		this.latitud = latitud;
+	}
+
+	public Double getLongitud() {
+		return longitud;
+	}
+
+	public void setLongitud(Double longitud) {
+		this.longitud = longitud;
+	}
+
+	public Escuela getEscuela() {
+		return escuela;
+	}
+
+	public void setEscuela(Escuela escuela) {
+		this.escuela = escuela;
+	}
 
 	@Override
 	public int hashCode() {
@@ -72,7 +89,7 @@ public class Escuela {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Escuela other = (Escuela) obj;
+		Sector other = (Sector) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -83,7 +100,8 @@ public class Escuela {
 
 	@Override
 	public String toString() {
-		return "Escuela [id=" + id + ", nombre=" + nombre + ", sectores=" + sectores + "]";
+		return "Sector [id=" + id + ", nombre=" + nombre + ", latitud=" + latitud + ", longitud=" + longitud
+				+ ", escuela=" + escuela + "]";
 	}
 
 }

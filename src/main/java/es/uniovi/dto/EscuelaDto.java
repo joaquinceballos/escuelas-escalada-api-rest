@@ -1,5 +1,7 @@
 package es.uniovi.dto;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 
 public class EscuelaDto {
@@ -8,6 +10,8 @@ public class EscuelaDto {
 
 	@NotBlank
 	private String nombre;
+
+	private List<SectorDto> sectores;
 
 	public Long getId() {
 		return id;
@@ -25,9 +29,17 @@ public class EscuelaDto {
 		this.nombre = nombre;
 	}
 
+	public List<SectorDto> getSectores() {
+		return sectores;
+	}
+
+	public void setSectores(List<SectorDto> sectores) {
+		this.sectores = sectores;
+	}
+
 	@Override
 	public String toString() {
-		return "EscuelaDto [id=" + id + ", nombre=" + nombre + "]";
+		return "EscuelaDto [id=" + id + ", nombre=" + nombre + ", sectores=" + sectores + "]";
 	}
 
 }
