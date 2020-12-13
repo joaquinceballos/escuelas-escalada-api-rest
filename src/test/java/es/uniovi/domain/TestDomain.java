@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,10 @@ class TestDomain {
 		Escuela escuela3 = new Escuela();
 		escuela3.setId(1L);
 		escuela1.setNombre("nombre");
-		escuela1.setSectores(new ArrayList<>());
+		escuela1.setSectores(new HashSet<>());
 		assertEquals(1L, escuela1.getId());
 		assertEquals("nombre", escuela1.getNombre());
-		assertEquals(new ArrayList<Sector>(), escuela1.getSectores());
+		assertEquals(new HashSet<Sector>(), escuela1.getSectores());
 		assertNotEquals(escuela1, escuela2);
 		assertEquals(escuela1, escuela3);
 		assertNotNull(escuela1.toString());
@@ -48,13 +49,13 @@ class TestDomain {
 		sector.setLatitud(0.0);
 		sector.setLongitud(0.0);
 		sector.setNombre("nombre");
-		sector.setVias(new ArrayList<>());
+		sector.setVias(new HashSet<>());
 		assertEquals(1L, sector.getId());
 		assertEquals(new Escuela(), sector.getEscuela());
 		assertEquals(0.0, sector.getLatitud());
 		assertEquals(0.0, sector.getLongitud());
 		assertEquals("nombre", sector.getNombre());
-		assertEquals(new ArrayList<>(), sector.getVias());
+		assertEquals(new HashSet<>(), sector.getVias());
 		assertNotEquals(new Sector(), sector);
 		assertNotNull(sector.toString());
 		assertNotNull(sector.hashCode());

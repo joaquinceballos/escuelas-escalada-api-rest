@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
 
+@Validated
 @RestController
 @RequestMapping("escuela")
 public class EscuelaController extends BaseController {
@@ -38,7 +40,7 @@ public class EscuelaController extends BaseController {
 	@GetMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
-			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(1) Integer page,
+			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(0) Integer page,
 			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) {
 		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size)), ApiResponseStatus.SUCCESS);
 	}

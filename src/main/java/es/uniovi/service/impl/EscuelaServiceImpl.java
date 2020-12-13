@@ -68,8 +68,8 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Sector addSector(Long idSector, Sector sector) throws ServiceException {
-		Escuela escuela = doGetEscuela(idSector);
+	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
+		Escuela escuela = doGetEscuela(idEscuela);
 		sector.setEscuela(escuela);
 		try {
 			return sectorRepository.save(sector);

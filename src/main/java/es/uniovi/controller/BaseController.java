@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintViolationException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -39,8 +40,7 @@ public abstract class BaseController {
 	
     private static final Logger logger = LogManager.getLogger(BaseController.class);
 
-	@Autowired
-	private ModelMapper modelMapper;
+	private ModelMapper modelMapper = new ModelMapper();
 
 	///////////////////////////////
 	//// manejo de excepciones ////
@@ -102,7 +102,7 @@ public abstract class BaseController {
 	
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	protected ApiResponse<Map<String, Object>> handleException(HttpMessageNotReadableException e){
+	protected ApiResponse<Map<String, Object>> handleException(HttpMessageNotReadableException e) {
 		Map<String, Object> errors = new HashMap<>();
 		if (e.getCause() instanceof InvalidFormatException) {
 			InvalidFormatException invalidFormatException = (InvalidFormatException) e.getCause();
@@ -110,6 +110,16 @@ public abstract class BaseController {
 			errors.put("tipo esperado", invalidFormatException.getTargetType().getSimpleName());
 			errors.put("valor pasado", invalidFormatException.getValue());			
 		}
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ConstraintViolationException.class)
+	protected ApiResponse<Map<String, Object>> handleException(ConstraintViolationException e) {
+		Map<String, Object> errors = new HashMap<>();
+		e.getConstraintViolations()
+			.stream()
+			.forEach(v -> errors.put(v.getPropertyPath().toString(), v.getInvalidValue() + " - " + v.getMessage()));
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
 

@@ -22,7 +22,7 @@ public interface EscuelaService {
 	
 	Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException;
 
-	Sector addSector(Long idSector, Sector sector) throws ServiceException;
+	Sector addSector(Long idEscuela, Sector sector) throws ServiceException;
 
 	Set<Via> getVias(Long idEscuela, Long idSector) throws ServiceException;
 
