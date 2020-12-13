@@ -3,6 +3,8 @@ package es.uniovi.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
+import es.uniovi.api.ListaPaginada;
 import es.uniovi.domain.Via;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
@@ -30,6 +34,14 @@ public class EscuelaController extends BaseController {
 
 	@Autowired
 	private EscuelaService escuelaService;
+	
+	@GetMapping()
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
+			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(1) Integer page,
+			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) {
+		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size)), ApiResponseStatus.SUCCESS);
+	}
 
 	@GetMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.OK)

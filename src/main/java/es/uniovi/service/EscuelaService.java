@@ -2,6 +2,8 @@ package es.uniovi.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.Via;
@@ -23,5 +25,7 @@ public interface EscuelaService {
 	Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
 
 	Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException;
+
+	Page<Escuela> getEscuelas(Integer page, Integer size);
 
 }

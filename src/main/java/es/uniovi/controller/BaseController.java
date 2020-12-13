@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
+import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
@@ -122,8 +124,8 @@ public abstract class BaseController {
 		return modelMapper.map(escuela, EscuelaDto.class);
 	}
 
-	protected List<SectorDto> toSectoresDto(List<Sector> sectores) {
-		return sectores.stream().map(this::toDto).collect(Collectors.toList());
+	private List<EscuelaDto> toEscuelasDto(List<Escuela> escuelas) {
+		return escuelas.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
 	protected SectorDto toDto(Sector sector) {
@@ -134,6 +136,10 @@ public abstract class BaseController {
 		return modelMapper.map(sectorDto, Sector.class);
 	}
 	
+	protected List<SectorDto> toSectoresDto(List<Sector> sectores) {
+		return sectores.stream().map(this::toDto).collect(Collectors.toList());
+	}
+
 	protected ViaDto toDto(Via via) {
 		return modelMapper.map(via, ViaDto.class);
 	}
@@ -144,5 +150,14 @@ public abstract class BaseController {
 	
 	protected List<ViaDto> toViasDto(List<Via> vias) {
 		return vias.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected ListaPaginada<EscuelaDto> toDto(Page<Escuela> paginaEscuelas) {
+		ListaPaginada<EscuelaDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaEscuelas.getSize());
+		listaPaginada.setPage(paginaEscuelas.getNumber());
+		listaPaginada.setContenido(toEscuelasDto(paginaEscuelas.getContent()));
+		listaPaginada.setTotalPaginas(paginaEscuelas.getTotalPages());
+		return listaPaginada;
 	}
 }

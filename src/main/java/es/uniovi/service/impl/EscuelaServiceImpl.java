@@ -7,6 +7,9 @@ import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Escuela;
@@ -33,6 +36,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	
 	@Autowired
 	private ViaRepository viaRepository;
+
+	@Override
+	public Page<Escuela> getEscuelas(Integer page, Integer size) {
+		return escuelaRepository.findAll(PageRequest.of(page, size, Sort.by("nombre")));
+	}
 
 	@Override
 	public Escuela getEscuela(Long id) throws NoEncontradoException {
