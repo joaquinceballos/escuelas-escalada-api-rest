@@ -1,14 +1,14 @@
 package es.uniovi.domain;
 
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
@@ -25,8 +25,9 @@ public class Escuela {
 	@Column(nullable = false)
 	private String nombre;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "escuela")
-	private List<Sector> sectores;
+	@OrderBy("nombre")
+	@OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "escuela")
+	private Set<Sector> sectores;
 
 	public Escuela() {
 		super();
@@ -48,11 +49,11 @@ public class Escuela {
 		this.nombre = nombre;
 	}
 
-	public List<Sector> getSectores() {
+	public Set<Sector> getSectores() {
 		return sectores;
 	}
 
-	public void setSectores(List<Sector> sectores) {
+	public void setSectores(Set<Sector> sectores) {
 		this.sectores = sectores;
 	}	
 

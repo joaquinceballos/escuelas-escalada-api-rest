@@ -3,6 +3,7 @@ package es.uniovi.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -136,7 +137,7 @@ public abstract class BaseController {
 		return modelMapper.map(sectorDto, Sector.class);
 	}
 	
-	protected List<SectorDto> toSectoresDto(List<Sector> sectores) {
+	protected List<SectorDto> toSectoresDto(Set<Sector> sectores) {
 		return sectores.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
@@ -148,7 +149,7 @@ public abstract class BaseController {
 		return modelMapper.map(viaDto, Via.class);
 	}
 	
-	protected List<ViaDto> toViasDto(List<Via> vias) {
+	protected List<ViaDto> toViasDto(Set<Via> vias) {
 		return vias.stream().map(this::toDto).collect(Collectors.toList());
 	}
 	

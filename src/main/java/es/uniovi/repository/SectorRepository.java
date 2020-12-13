@@ -1,6 +1,6 @@
 package es.uniovi.repository;
 
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -11,6 +11,6 @@ import es.uniovi.domain.Sector;
 @Repository
 public interface SectorRepository extends CrudRepository<Sector, Long>{
 
-	List<Sector> findByEscuela(Escuela escuela);
+	Set<Sector> findByEscuela(Escuela escuela);
 
 }

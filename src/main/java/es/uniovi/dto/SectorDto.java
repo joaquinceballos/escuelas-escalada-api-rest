@@ -1,5 +1,7 @@
 package es.uniovi.dto;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,6 +23,9 @@ public class SectorDto implements Ubicable {
 
 	@JsonInclude(Include.NON_NULL)
 	private Double longitud;
+
+	@JsonInclude(Include.NON_NULL)
+	private List<ViaDto> vias;
 
 	public Long getId() {
 		return id;
@@ -54,8 +59,17 @@ public class SectorDto implements Ubicable {
 		this.nombre = nombre;
 	}
 
+	public List<ViaDto> getVias() {
+		return vias;
+	}
+
+	public void setVias(List<ViaDto> vias) {
+		this.vias = vias;
+	}
+
 	@Override
 	public String toString() {
-		return "SectorDto [id=" + id + ", nombre=" + nombre + ", latitud=" + latitud + ", longitud=" + longitud + "]";
+		return "SectorDto [id=" + id + ", nombre=" + nombre + ", latitud=" + latitud + ", longitud=" + longitud
+				+ ", vias=" + vias + "]";
 	}
 }

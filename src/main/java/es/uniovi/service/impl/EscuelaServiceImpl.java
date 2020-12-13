@@ -1,8 +1,8 @@
 package es.uniovi.service.impl;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public List<Sector> getSectores(Long id) throws NoEncontradoException {
+	public Set<Sector> getSectores(Long id) throws NoEncontradoException {
 		return sectorRepository.findByEscuela(doGetEscuela(id));
 	}
 
@@ -79,7 +79,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public List<Via> getVias(Long idEscuela, Long idSector) throws ServiceException {
+	public Set<Via> getVias(Long idEscuela, Long idSector) throws ServiceException {
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = doGetSectorDeEscuela(idSector, escuela);
 		return sector.getVias();

@@ -1,8 +1,7 @@
 package es.uniovi.domain;
 
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -11,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
@@ -37,8 +37,9 @@ public class Sector implements Ubicable {
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_SECTOR_ESCUELA"))
 	private Escuela escuela;
 
-	@OneToMany(mappedBy = "sector", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<Via> vias;
+	@OrderBy("nombre")
+	@OneToMany(mappedBy = "sector", orphanRemoval = true, fetch = FetchType.EAGER)
+	private Set<Via> vias;
 
 	public Sector() {
 		super();
@@ -84,11 +85,11 @@ public class Sector implements Ubicable {
 		this.escuela = escuela;
 	}
 
-	public List<Via> getVias() {
+	public Set<Via> getVias() {
 		return vias;
 	}
 
-	public void setVias(List<Via> vias) {
+	public void setVias(Set<Via> vias) {
 		this.vias = vias;
 	}
 
@@ -120,7 +121,7 @@ public class Sector implements Ubicable {
 	@Override
 	public String toString() {
 		return "Sector [id=" + id + ", nombre=" + nombre + ", latitud=" + latitud + ", longitud=" + longitud
-				+ ", escuela=" + escuela + ", vias=" + vias + "]";
+				+ ", vias=" + vias + "]";
 	}
 
 }

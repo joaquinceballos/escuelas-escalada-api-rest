@@ -109,7 +109,7 @@ public class Via {
 	@Override
 	public String toString() {
 		return "Via [id=" + id + ", nombre=" + nombre + ", grado=" + grado + ", numeroChapas=" + numeroChapas
-				+ ", longitud=" + longitud + ", sector=" + sector + "]";
+				+ ", longitud=" + longitud + "]";
 	}
 
 }
