@@ -15,7 +15,9 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CoordenadasValidator.class)
 public @interface Coordenadas {
-    String message() default "Invalid phone number";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+	String message() default "Coordenadas pasadas no son correctas";
+
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
 }

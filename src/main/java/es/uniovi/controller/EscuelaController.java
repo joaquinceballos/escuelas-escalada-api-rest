@@ -36,7 +36,14 @@ public class EscuelaController extends BaseController {
 
 	@Autowired
 	private EscuelaService escuelaService;
-	
+
+	/**
+	 * Retorna una lista paginada de escuelas
+	 * 
+	 * @param page La página
+	 * @param size El tamaño de la página
+	 * @return Response con la lista paginada de escuelas
+	 */
 	@GetMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
@@ -45,25 +52,54 @@ public class EscuelaController extends BaseController {
 		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size)), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Retorna la escuela cuya id es pasada
+	 * 
+	 * @param id La id de la escuela
+	 * @return Response conteniendo la escula
+	 * @throws ServiceException
+	 */
 	@GetMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<EscuelaDto> getEscuela(@PathVariable(name = "id") @NotNull Long id) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.getEscuela(id)), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Persiste y retorna la escuela de escalada pasada
+	 * 
+	 * @param escuelaDto DTO de la escuela a persistir
+	 * @return Response con la escuela persistida
+	 * @throws ServiceException
+	 */
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<EscuelaDto> addEscuela(@Valid @RequestBody EscuelaDto escuelaDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addEscuela(toEntity(escuelaDto))), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Retorna los sectores de la escuela cuya id es pasada
+	 * 
+	 * @param id La id de la escuela
+	 * @return Response con la lista de sectores solicitada
+	 * @throws ServiceException
+	 */
 	@GetMapping("/{id}/sector")
 	@ResponseStatus(code = HttpStatus.OK)
-	public ApiResponse<List<SectorDto>> getSectores(
-			@PathVariable(name = "id") @NotNull Long id) throws ServiceException {
+	public ApiResponse<List<SectorDto>> getSectores(@PathVariable(name = "id") @NotNull Long id)
+			throws ServiceException {
 		return new ApiResponse<>(toSectoresDto(escuelaService.getSectores(id)), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Retorna el sector cuya id es pasado+
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @return Response con el sector solicitado
+	 * @throws ServiceException
+	 */
 	@GetMapping("/{idEscuela}/sector/{idSector}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<SectorDto> getSector(
@@ -72,14 +108,30 @@ public class EscuelaController extends BaseController {
 		return new ApiResponse<>(toDto(escuelaService.getSector(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Persiste el sector cuyo DTO es pasado
+	 * 
+	 * @param id        La id de la escuela
+	 * @param sectorDto El sector a persistir
+	 * @return Response conteniendo el sector persistido
+	 * @throws ServiceException
+	 */
 	@PostMapping("/{id}/sector")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<SectorDto> addSector(
 			@PathVariable(name = "id") @NotNull Long id,
-	        @Valid @RequestBody SectorDto sectorDto) throws ServiceException {
+			@Valid @RequestBody SectorDto sectorDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addSector(id, toEntity(sectorDto))), ApiResponseStatus.SUCCESS);
 	}
-	
+
+	/**
+	 * Retorna la lista de vías del sector pasado
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @return La lista de vías
+	 * @throws ServiceException
+	 */
 	@GetMapping("/{idEscuela}/sector/{idSector}/via")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<List<ViaDto>> getVias(
@@ -87,7 +139,16 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "idSector") Long idSector) throws ServiceException {
 		return new ApiResponse<>(toViasDto(escuelaService.getVias(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
 	}
-	
+
+	/**
+	 * Retorna la vía cuya id es pasada
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @return Response conteniendo la vía solicitada
+	 * @throws ServiceException
+	 */
 	@GetMapping("/{idEscuela}/sector/{idSector}/via/{idVia}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ViaDto> getVia(
@@ -97,6 +158,15 @@ public class EscuelaController extends BaseController {
 		return new ApiResponse<>(toDto(escuelaService.getVia(idEscuela, idSector, idVia)), ApiResponseStatus.SUCCESS);
 	}
 
+	/**
+	 * Persiste nueva vía
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param viaDto    DTO de la vía a persistir
+	 * @return La vía persistida
+	 * @throws ServiceException
+	 */
 	@PostMapping("/{idEscuela}/sector/{idSector}/via")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<ViaDto> addVia(

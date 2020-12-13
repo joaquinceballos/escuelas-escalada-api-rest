@@ -10,6 +10,12 @@ import es.uniovi.domain.Escuela;
 @Repository
 public interface EscuelaRepository extends CrudRepository<Escuela, Long> {
 
+	/**
+	 * recupera las escuelas de BDD
+	 * 
+	 * @param pageable Configuración de la página
+	 * @return La página de Escuela
+	 */
 	Page<Escuela> findAll(Pageable pageable);
 
 }
