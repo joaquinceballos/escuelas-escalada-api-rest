@@ -62,6 +62,12 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
+	public Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		return doGetSectorDeEscuela(idSector, escuela);
+	}
+
+	@Override
 	public Sector addSector(Long idSector, Sector sector) throws ServiceException {
 		Escuela escuela = doGetEscuela(idSector);
 		sector.setEscuela(escuela);

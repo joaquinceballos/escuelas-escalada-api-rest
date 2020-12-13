@@ -12,11 +12,15 @@ import es.uniovi.exception.ServiceException;
 
 public interface EscuelaService {
 
+	Page<Escuela> getEscuelas(Integer page, Integer size);
+	
 	Escuela getEscuela(Long id) throws NoEncontradoException;
 
 	Escuela addEscuela(Escuela escuela) throws ServiceException;
 
 	List<Sector> getSectores(Long id) throws NoEncontradoException;
+	
+	Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException;
 
 	Sector addSector(Long idSector, Sector sector) throws ServiceException;
 
@@ -25,7 +29,5 @@ public interface EscuelaService {
 	Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
 
 	Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException;
-
-	Page<Escuela> getEscuelas(Integer page, Integer size);
 
 }

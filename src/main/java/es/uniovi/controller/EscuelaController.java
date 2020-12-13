@@ -35,7 +35,7 @@ public class EscuelaController extends BaseController {
 	@Autowired
 	private EscuelaService escuelaService;
 	
-	@GetMapping()
+	@GetMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
 			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(1) Integer page,
@@ -60,6 +60,14 @@ public class EscuelaController extends BaseController {
 	public ApiResponse<List<SectorDto>> getSectores(
 			@PathVariable(name = "id") @NotNull Long id) throws ServiceException {
 		return new ApiResponse<>(toSectoresDto(escuelaService.getSectores(id)), ApiResponseStatus.SUCCESS);
+	}
+
+	@GetMapping("/{idEscuela}/sector/{idSector}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<SectorDto> getSector(
+			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+			@PathVariable(name = "idSector") @NotNull Long idSector) throws ServiceException {
+		return new ApiResponse<>(toDto(escuelaService.getSector(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
 	}
 
 	@PostMapping("/{id}/sector")
