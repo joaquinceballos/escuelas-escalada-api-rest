@@ -26,7 +26,9 @@ import es.uniovi.service.EscuelaService;
 @Service
 public class EscuelaServiceImpl implements EscuelaService {
 
-	private static final Supplier<? extends NoSuchElementException> INCONSISTENCIA_EXCEPTION_SUPPLIER = () -> new NoSuchElementException("Inconsistencia en los datos, recurso debería de existir");
+	private static final Supplier<? extends NoSuchElementException> INCONSISTENCIA_EXCEPTION_SUPPLIER = () -> {
+		return new NoSuchElementException("Inconsistencia en los datos, recurso debería de existir");
+	};			
 
 	@Autowired
 	private EscuelaRepository escuelaRepository;
@@ -50,7 +52,13 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Override
 	public Escuela addEscuela(Escuela escuela) throws ServiceException {
 		try {
-			return escuelaRepository.save(escuela);
+			escuelaRepository.save(escuela);
+			if (escuela.getSectores() != null) {
+				for (Sector sector : escuela.getSectores()) {
+					doAddSector(escuela, sector);
+				}
+			}
+			return escuela;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
@@ -70,12 +78,22 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Override
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
 		Escuela escuela = doGetEscuela(idEscuela);
+		return doAddSector(escuela, sector); 
+	}
+
+	private Sector doAddSector(Escuela escuela, Sector sector) throws RestriccionDatosException {
 		sector.setEscuela(escuela);
 		try {
-			return sectorRepository.save(sector);
+			sectorRepository.save(sector);
+			if (sector.getVias() != null) {
+				for (Via via : sector.getVias()) {
+					doAddVia(sector, via);
+				}
+			}
+			return sector;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
-		} 
+		}
 	}
 
 	@Override
@@ -96,12 +114,16 @@ public class EscuelaServiceImpl implements EscuelaService {
 	public Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException {
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		return doAddVia(sector, via); 		
+	}
+
+	private Via doAddVia(Sector sector, Via via) throws RestriccionDatosException {
 		via.setSector(sector);
 		try {
 			return viaRepository.save(via);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
-		} 		
+		}
 	}
 
 	private Escuela doGetEscuela(Long id) throws NoEncontradoException {
