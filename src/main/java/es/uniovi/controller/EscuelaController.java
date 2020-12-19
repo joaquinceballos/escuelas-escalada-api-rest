@@ -31,7 +31,7 @@ import es.uniovi.service.EscuelaService;
 
 @Validated
 @RestController
-@RequestMapping("escuela")
+@RequestMapping("escuelas")
 public class EscuelaController extends BaseController {
 
 	@Autowired
@@ -85,7 +85,7 @@ public class EscuelaController extends BaseController {
 	 * @return Response con la lista de sectores solicitada
 	 * @throws ServiceException
 	 */
-	@GetMapping("/{id}/sector")
+	@GetMapping("/{id}/sectores")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<List<SectorDto>> getSectores(@PathVariable(name = "id") @NotNull Long id)
 			throws ServiceException {
@@ -100,7 +100,7 @@ public class EscuelaController extends BaseController {
 	 * @return Response con el sector solicitado
 	 * @throws ServiceException
 	 */
-	@GetMapping("/{idEscuela}/sector/{idSector}")
+	@GetMapping("/{idEscuela}/sectores/{idSector}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<SectorDto> getSector(
 			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
@@ -132,7 +132,7 @@ public class EscuelaController extends BaseController {
 	 * @return La lista de vías
 	 * @throws ServiceException
 	 */
-	@GetMapping("/{idEscuela}/sector/{idSector}/via")
+	@GetMapping("/{idEscuela}/sectores/{idSector}/vias")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<List<ViaDto>> getVias(
 			@PathVariable(name = "idEscuela") Long idEscuela,
@@ -149,7 +149,7 @@ public class EscuelaController extends BaseController {
 	 * @return Response conteniendo la vía solicitada
 	 * @throws ServiceException
 	 */
-	@GetMapping("/{idEscuela}/sector/{idSector}/via/{idVia}")
+	@GetMapping("/{idEscuela}/sectores/{idSector}/vias/{idVia}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ViaDto> getVia(
 			@PathVariable(name = "idEscuela") Long idEscuela,
@@ -167,7 +167,7 @@ public class EscuelaController extends BaseController {
 	 * @return La vía persistida
 	 * @throws ServiceException
 	 */
-	@PostMapping("/{idEscuela}/sector/{idSector}/via")
+	@PostMapping("/{idEscuela}/sectores/{idSector}/vias")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<ViaDto> addVia(
 			@PathVariable(name = "idEscuela") Long idEscuela,
