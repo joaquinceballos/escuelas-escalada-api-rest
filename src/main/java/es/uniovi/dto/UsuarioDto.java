@@ -3,6 +3,9 @@ package es.uniovi.dto;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 public class UsuarioDto {
 
 	private Long id;
@@ -15,6 +18,7 @@ public class UsuarioDto {
 	private String email;
 
 	@NotBlank
+	@JsonInclude(Include.NON_NULL)
 	private String password;
 
 	public UsuarioDto() {

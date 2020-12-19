@@ -29,9 +29,11 @@ import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
+import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -171,4 +173,28 @@ public abstract class BaseController {
 		listaPaginada.setTotalPaginas(paginaEscuelas.getTotalPages());
 		return listaPaginada;
 	}
+	
+	protected Usuario toEntity(UsuarioDto usuarioDto) {
+		return modelMapper.map(usuarioDto, Usuario.class);
+	}
+	
+	protected UsuarioDto toDto(Usuario usuario) {
+		UsuarioDto usuarioDto = modelMapper.map(usuario, UsuarioDto.class);
+		usuarioDto.setPassword(null);
+		return usuarioDto;
+	}
+	
+	protected ListaPaginada<UsuarioDto> pageUsuarioToDto(Page<Usuario> usuarios) {
+		ListaPaginada<UsuarioDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(usuarios.getSize());
+		listaPaginada.setPage(usuarios.getNumber());
+		listaPaginada.setContenido(toUsuariosDto(usuarios.getContent()));
+		listaPaginada.setTotalPaginas(usuarios.getTotalPages());
+		return listaPaginada;
+	}
+
+	private List<UsuarioDto> toUsuariosDto(List<Usuario> usuarios) {
+		return usuarios.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
 }
