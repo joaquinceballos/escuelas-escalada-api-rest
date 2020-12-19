@@ -16,4 +16,3 @@ target/
 /mvnw*
 .dbeaver/
 Scripts/
-src/main/resources/application.properties
