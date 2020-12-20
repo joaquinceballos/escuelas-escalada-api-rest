@@ -3,6 +3,7 @@ package es.uniovi.domain;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,7 +28,7 @@ public class Usuario {
 	
 	private String email;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_rol",
 	           joinColumns = @JoinColumn(name = "usuario_id",
 	                                     referencedColumnName = "id", 
