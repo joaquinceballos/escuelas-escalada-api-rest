@@ -9,7 +9,7 @@ public abstract class Constantes {
 	/**
 	 * Tiempo en milisegundos a partir del cual caducarán los tokens generados
 	 */
-	public static final long EXPIRATION_TIME = 60 * 60 * 1000; // 1 hora
+	public static final Long EXPIRATION_TIME = (long) (60 * 60 * 1000); // 1 hora
 
 	/**
 	 * Prefijo "Bearer " en los tokens generados
