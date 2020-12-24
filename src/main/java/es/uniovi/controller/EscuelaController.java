@@ -116,7 +116,7 @@ public class EscuelaController extends BaseController {
 	 * @return Response conteniendo el sector persistido
 	 * @throws ServiceException
 	 */
-	@PostMapping("/{id}/sector")
+	@PostMapping("/{id}/sectores")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<SectorDto> addSector(
 			@PathVariable(name = "id") @NotNull Long id,
