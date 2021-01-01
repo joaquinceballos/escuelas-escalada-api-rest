@@ -1,21 +1,19 @@
 package es.uniovi.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import es.uniovi.domain.Escuela;
 
 @Repository
-public interface EscuelaRepository extends CrudRepository<Escuela, Long> {
+public interface EscuelaRepository extends JpaRepository<Escuela, Long> {
 
 	/**
-	 * recupera las escuelas de BDD
+	 * Comprueba si existe una escuela cuyo nombre es pasado
 	 * 
-	 * @param pageable Configuración de la página
-	 * @return La página de Escuela
+	 * @param name El nombre a buscar
+	 * @return True si existe una escuela con el nombre pasado
 	 */
-	Page<Escuela> findAll(Pageable pageable);
+	boolean existsByNombre(String nombre);
 
 }
