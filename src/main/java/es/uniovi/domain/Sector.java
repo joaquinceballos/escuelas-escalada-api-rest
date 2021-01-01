@@ -1,7 +1,9 @@
 package es.uniovi.domain;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -14,6 +16,9 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.uniovi.validation.Coordenadas;
 
@@ -33,13 +38,18 @@ public class Sector implements Ubicable {
 
 	private Double longitud;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_SECTOR_ESCUELA"))
 	private Escuela escuela;
 
-	@OrderBy("nombre")
-	@OneToMany(mappedBy = "sector", orphanRemoval = true, fetch = FetchType.EAGER)
-	private Set<Via> vias;
+	@NotNull
+	@OrderBy("id")
+	@OneToMany(mappedBy = "sector",
+	           orphanRemoval = true,
+	           fetch = FetchType.EAGER,
+	           cascade = { CascadeType.REMOVE })
+	private Set<@NotNull Via> vias = new HashSet<>();
 
 	public Sector() {
 		super();

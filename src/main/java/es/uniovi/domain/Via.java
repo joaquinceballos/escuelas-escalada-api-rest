@@ -8,6 +8,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_VIA_NOMBRE_SECTOR", columnNames = { "NOMBRE", "SECTOR" }))
@@ -17,14 +21,19 @@ public class Via {
 	@GeneratedValue
 	private Long id;
 
+	@NotBlank
 	private String nombre;
 
+	@NotBlank
 	private String grado; // TODO se debé validar el grado??
 
+	@Min(0)
 	private Integer numeroChapas;
 
+	@Min(0)
 	private Double longitud;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_VIA_SECTOR"))
 	private Sector sector;

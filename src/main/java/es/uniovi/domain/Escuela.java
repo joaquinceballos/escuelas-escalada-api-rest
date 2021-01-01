@@ -1,7 +1,9 @@
 package es.uniovi.domain;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +14,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
@@ -25,9 +28,10 @@ public class Escuela {
 	@Column(nullable = false)
 	private String nombre;
 
-	@OrderBy("nombre")
-	@OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "escuela")
-	private Set<Sector> sectores;
+	@NotNull
+	@OrderBy("id")
+	@OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "escuela", cascade = CascadeType.ALL)
+	private Set<@NotNull Sector> sectores = new HashSet<>();
 
 	public Escuela() {
 		super();
