@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.github.fge.jsonpatch.JsonPatch;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
@@ -76,6 +79,22 @@ public class EscuelaController extends BaseController {
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ApiResponse<EscuelaDto> addEscuela(@Valid @RequestBody EscuelaDto escuelaDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addEscuela(toEntity(escuelaDto))), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Modifica la escuela cuya id es pasada
+	 * 
+	 * @param id        La id de la escuela a cambiar
+	 * @param jsonPatch Los cambios a aplicar en la escuela
+	 * @return Response con la escuela actualizada
+	 * @throws ServiceException
+	 */
+	@PatchMapping("/{id}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<EscuelaDto> patchEscuela(
+			@PathVariable(name = "id") @NotNull Long id,
+			@RequestBody JsonPatch jsonPatch) throws ServiceException {
+		return new ApiResponse<>(toDto(escuelaService.actualizaEscuela(id, jsonPatch)), ApiResponseStatus.SUCCESS);
 	}
 
 	/**

@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
+import com.github.fge.jsonpatch.JsonPatch;
+
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.Via;
@@ -100,5 +102,15 @@ public interface EscuelaService {
 	 * @throws NoEncontradoException
 	 */
 	Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException;
+
+	/**
+	 * Actualiza la escuela cuyo id es pasado
+	 * 
+	 * @param id        La id de la escuela a modificar
+	 * @param jsonPatch Las cambios a aplicar en la escuela
+	 * @return La escuela modificada
+	 * @throws ServiceException
+	 */
+	Escuela actualizaEscuela(Long id, JsonPatch jsonPatch) throws ServiceException;
 
 }

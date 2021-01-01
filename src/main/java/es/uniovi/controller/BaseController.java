@@ -1,5 +1,6 @@
 package es.uniovi.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
@@ -36,6 +38,7 @@ import es.uniovi.dto.SectorDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
+import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
 
 public abstract class BaseController {
@@ -50,7 +53,7 @@ public abstract class BaseController {
 
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-	protected ApiResponse<Void> handleException(Exception e) {
+	protected ApiResponse<Void> handleException(Exception e) throws Exception {
 		logger.error(e);
 		return new ApiResponse<>("Error general del servidor", Constantes.ERROR_INTERNO);
 	}
@@ -110,7 +113,10 @@ public abstract class BaseController {
 			InvalidFormatException invalidFormatException = (InvalidFormatException) e.getCause();
 			errors.put("campo", invalidFormatException.getPath().get(0).getFieldName());
 			errors.put("tipo esperado", invalidFormatException.getTargetType().getSimpleName());
-			errors.put("valor pasado", invalidFormatException.getValue());			
+			errors.put("valor pasado", invalidFormatException.getValue());
+		} else if (e.getCause() instanceof InvalidTypeIdException) {
+			InvalidTypeIdException invalidTypeIdException = (InvalidTypeIdException) e.getCause();
+			errors.put("tipo", invalidTypeIdException.getTypeId());
 		}
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
@@ -123,6 +129,13 @@ public abstract class BaseController {
 			.stream()
 			.forEach(v -> errors.put(v.getPropertyPath().toString(), v.getInvalidValue() + " - " + v.getMessage()));
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(PatchInvalidoException.class)
+	protected ApiResponse<Map<String, Object>> handleException(PatchInvalidoException e) {
+		Map<String, Object> errors = Collections.singletonMap("error", e.getMessage());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
 	}
 
 	///////////////////////////////

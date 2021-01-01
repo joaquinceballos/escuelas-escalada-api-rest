@@ -7,9 +7,9 @@ public abstract class ServiceException extends Exception {
 	 */
 	private static final long serialVersionUID = -6053411947493627367L;
 
-	public ServiceException() {}
+	protected ServiceException() {}
 
-	public ServiceException(String mensaje) {
+	protected ServiceException(String mensaje) {
 		super(mensaje);
 	}
 
