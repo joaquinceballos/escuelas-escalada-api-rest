@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -99,6 +100,22 @@ public class EscuelaController extends BaseController {
 	}
 	
 	/**
+	 * Actualiza la escuela pasada
+	 * 
+	 * @param id         La id de la escuela
+	 * @param escuelaDto El dto de la escuela a actualizar
+	 * @return Response con la escuela actualizada
+	 * @throws ServiceException
+	 */
+	@PutMapping("/{id}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<EscuelaDto> putEscuela(
+			@PathVariable(name = "id") @NotNull Long id,
+			@RequestBody @Valid EscuelaDto escuelaDto) throws ServiceException {
+		return new ApiResponse<>(toDto(escuelaService.actualizaEscuela(id, toEntity(escuelaDto))), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
 	 * Elimina la escuela cuya id es pasada en el path
 	 * 
 	 * @param id La id de la escuela a borrar
@@ -156,6 +173,25 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "id") @NotNull Long id,
 			@Valid @RequestBody SectorDto sectorDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addSector(id, toEntity(sectorDto))), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Actualiza el sector pasado
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param sectorDto El dto del sector a actualizar
+	 * @return Response con el sector actualizado
+	 * @throws ServiceException
+	 */
+	@PutMapping("/{idEscuela}/sectores/{idSector}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<SectorDto> putSector(
+			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+			@PathVariable(name = "idSector") @NotNull Long idSector,
+			@Valid @RequestBody SectorDto sectorDto) throws ServiceException {
+		SectorDto data = toDto(escuelaService.actualizaSector(idEscuela, idSector, toEntity(sectorDto)));
+		return new ApiResponse<>(data, ApiResponseStatus.SUCCESS);
 	}
 	
 	/**
@@ -225,6 +261,27 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "idSector") Long idSector,
 			@RequestBody @Valid ViaDto viaDto) throws ServiceException {
 		Via nuevaVia = escuelaService.addVia(idEscuela, idSector, toEntity(viaDto));
+		return new ApiResponse<>(toDto(nuevaVia), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Actualiza la vía pasada
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @param viaDto    el dto de la vía con los campos a actualizar
+	 * @return Response con la vía actualizada
+	 * @throws ServiceException
+	 */
+	@PutMapping("/{idEscuela}/sectores/{idSector}/vias/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ViaDto> putVia(
+	@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+	@PathVariable(name = "idSector") @NotNull Long idSector,
+	@PathVariable(name = "idVia") @NotNull Long idVia,
+	@RequestBody @Valid ViaDto viaDto) throws ServiceException {
+		Via nuevaVia = escuelaService.actualizaVia(idEscuela, idSector, idVia, toEntity(viaDto));
 		return new ApiResponse<>(toDto(nuevaVia), ApiResponseStatus.SUCCESS);
 	}
 	

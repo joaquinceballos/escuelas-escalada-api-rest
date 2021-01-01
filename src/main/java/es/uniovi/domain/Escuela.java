@@ -30,7 +30,10 @@ public class Escuela {
 
 	@NotNull
 	@OrderBy("id")
-	@OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "escuela", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER,
+	           orphanRemoval = true,
+	           mappedBy = "escuela",
+	           cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	private Set<@NotNull Sector> sectores = new HashSet<>();
 
 	public Escuela() {

@@ -140,4 +140,37 @@ public interface EscuelaService {
 	 */
 	void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
 
+	/**
+	 * Actualiza todos los campos simples de la escuela cuyo id es pasado
+	 * 
+	 * @param id      La id de la escuela
+	 * @param escuela La escuela
+	 * @return La escuela actualizada
+	 * @throws NoEncontradoException
+	 */
+	Escuela actualizaEscuela(Long id, Escuela escuela) throws NoEncontradoException;
+
+	/**
+	 * Actualiza todos los campos simples del sector cuyo id es pasado
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param sector    El sector con los datos a actualizar
+	 * @return El sector actualizado
+	 * @throws NoEncontradoException
+	 */
+	Sector actualizaSector(Long idEscuela, Long idSector, Sector sector) throws NoEncontradoException;
+
+	/**
+	 * Actualiza todos los campos simples de la escuela pasada
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @param via       La vía con los campos a actualizar
+	 * @return La vía actualizada
+	 * @throws NoEncontradoException
+	 */
+	Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via) throws NoEncontradoException;
+
 }

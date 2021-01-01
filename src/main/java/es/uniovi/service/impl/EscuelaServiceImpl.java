@@ -64,16 +64,43 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Override
 	public Escuela addEscuela(Escuela escuela) throws ServiceException {
 		try {
-			escuelaRepository.save(escuela);
-			if (escuela.getSectores() != null) {
-				for (Sector sector : escuela.getSectores()) {
-					doAddSector(escuela, sector);
-				}
+			escuela.setId(null);
+			for (Sector sector : escuela.getSectores()) {
+				asociaNuevoSector(escuela, sector);
 			}
+			escuelaRepository.save(escuela);
 			return escuela;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
+	}
+
+	/**
+	 * <li>Asocia la escuela pasada al sector pasado
+	 * <li>Setea a null la id del sector
+	 * <li>Asocia las vías del nuevo sector
+	 * 
+	 * @param escuela La escuela
+	 * @param sector El sector
+	 */
+	private void asociaNuevoSector(Escuela escuela, Sector sector) {
+		sector.setEscuela(escuela);
+		sector.setId(null);
+		for (Via via : sector.getVias()) {
+			asociaSectorVia(sector, via);
+		}
+	}
+
+	/**
+	 * <li>Asocia el sector pasado a la vía pasada
+	 * <li>Setea la id a null
+	 * 
+	 * @param sector
+	 * @param via
+	 */
+	private void asociaSectorVia(Sector sector, Via via) {
+		via.setSector(sector);
+		via.setId(null);
 	}
 
 	@Override
@@ -89,20 +116,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Override
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
-		Escuela escuela = doGetEscuela(idEscuela);
-		return doAddSector(escuela, sector); 
-	}
-
-	private Sector doAddSector(Escuela escuela, Sector sector) throws RestriccionDatosException {
-		sector.setEscuela(escuela);
 		try {
-			sectorRepository.save(sector);
-			if (sector.getVias() != null) {
-				for (Via via : sector.getVias()) {
-					doAddVia(sector, via);
-				}
-			}
-			return sector;
+			asociaNuevoSector(doGetEscuela(idEscuela), sector);
+			return sectorRepository.save(sector);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
@@ -124,14 +140,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Override
 	public Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException {
-		Escuela escuela = doGetEscuela(idEscuela);
-		Sector sector = doGetSectorDeEscuela(idSector, escuela);
-		return doAddVia(sector, via); 		
-	}
-
-	private Via doAddVia(Sector sector, Via via) throws RestriccionDatosException {
-		via.setSector(sector);
 		try {
+			Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+			asociaSectorVia(sector, via);
 			return viaRepository.save(via);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -307,8 +318,33 @@ public class EscuelaServiceImpl implements EscuelaService {
 				.orElseThrow(() -> new NoEncontradoException("sector", idVia));
 		sector.getVias().remove(via);
 		sectorRepository.save(sector);
-		viaRepository.delete(via);
-		
+		viaRepository.delete(via);		
+	}
+
+	@Override
+	public Escuela actualizaEscuela(Long id, Escuela escuela2) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(id);
+		escuela.setNombre(escuela2.getNombre());
+		return escuelaRepository.save(escuela);
+	}
+
+	@Override
+	public Sector actualizaSector(Long idEscuela, Long idSector, Sector sector2) throws NoEncontradoException {
+		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+		sector.setLatitud(sector2.getLatitud());
+		sector.setLongitud(sector2.getLongitud());
+		sector.setNombre(sector2.getNombre());
+		return sectorRepository.save(sector);
+	}
+
+	@Override
+	public Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via2) throws NoEncontradoException {
+		Via via = doGetViaDeSector(idVia, doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela)));
+		via.setGrado(via2.getGrado());
+		via.setLongitud(via2.getLongitud());
+		via.setNombre(via2.getNombre());
+		via.setNumeroChapas(via2.getNumeroChapas());
+		return viaRepository.save(via);
 	}
 	
 }
