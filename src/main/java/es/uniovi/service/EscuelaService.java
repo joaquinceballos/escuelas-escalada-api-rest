@@ -113,4 +113,31 @@ public interface EscuelaService {
 	 */
 	Escuela actualizaEscuela(Long id, JsonPatch jsonPatch) throws ServiceException;
 
+	/**
+	 * Borra la escuela cuya id es pasada
+	 * 
+	 * @param id La id de la escuela a Borrar
+	 */
+	void deleteEscuela(Long id) throws NoEncontradoException;
+
+	/**
+	 * Borra el sector cuya id es pasada
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @throws NoEncontradoException
+	 */
+	void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException;
+
+	
+	/**
+	 * Borra la vía cuya id es pasada
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @throws NoEncontradoException
+	 */
+	void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
+
 }

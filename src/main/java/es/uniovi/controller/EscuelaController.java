@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -96,6 +97,20 @@ public class EscuelaController extends BaseController {
 			@RequestBody JsonPatch jsonPatch) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.actualizaEscuela(id, jsonPatch)), ApiResponseStatus.SUCCESS);
 	}
+	
+	/**
+	 * Elimina la escuela cuya id es pasada en el path
+	 * 
+	 * @param id La id de la escuela a borrar
+	 * @return Response con el resultado de la operación
+	 * @throws ServiceException
+	 */
+	@DeleteMapping("/{id}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<Void> deleteEscuela(@PathVariable("id") @NotNull Long id) throws ServiceException {
+		escuelaService.deleteEscuela(id);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
+	}
 
 	/**
 	 * Retorna los sectores de la escuela cuya id es pasada
@@ -141,6 +156,23 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "id") @NotNull Long id,
 			@Valid @RequestBody SectorDto sectorDto) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.addSector(id, toEntity(sectorDto))), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Elimina el sector cuya id es pasado en el path
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @return Response con el resultado de la operación
+	 * @throws ServiceException
+	 */
+	@DeleteMapping("/{idEscuela}/sectores/{idSector}")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<Void> deleteSector(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector) throws ServiceException {
+		escuelaService.deleteSector(idEscuela, idSector);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
 	}
 
 	/**
@@ -194,6 +226,25 @@ public class EscuelaController extends BaseController {
 			@RequestBody @Valid ViaDto viaDto) throws ServiceException {
 		Via nuevaVia = escuelaService.addVia(idEscuela, idSector, toEntity(viaDto));
 		return new ApiResponse<>(toDto(nuevaVia), ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Elimina la vía cuya id es pasada en el path
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @return Response con el resultado de la operación
+	 * @throws ServiceException
+	 */
+	@DeleteMapping("/{idEscuela}/sectores/{idSector}/vias/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<Void> deleteVia(
+			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+			@PathVariable(name = "idSector") @NotNull Long idSector,
+			@PathVariable(name = "idVia") @NotNull Long idVia) throws ServiceException {
+		escuelaService.deleteVia(idEscuela, idSector, idVia);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
 	}
 
 }

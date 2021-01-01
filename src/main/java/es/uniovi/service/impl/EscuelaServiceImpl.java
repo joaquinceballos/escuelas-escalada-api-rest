@@ -276,5 +276,39 @@ public class EscuelaServiceImpl implements EscuelaService {
 			throw new RestriccionDatosException("nombre: " + escuelaPatched.getNombre() + " ya existe");
 		}
 	}
+
+	@Override
+	public void deleteEscuela(Long id) throws NoEncontradoException {
+		escuelaRepository.delete(doGetEscuela(id));		
+	}
+
+	@Override
+	public void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = escuela
+				.getSectores()
+				.stream()
+				.filter(s -> idSector.equals(s.getId()))
+				.findAny()
+				.orElseThrow(() -> new NoEncontradoException("sector", idSector));
+		escuela.getSectores().remove(sector);
+		escuelaRepository.save(escuela);
+		sectorRepository.delete(sector);
+	}
+
+	@Override
+	public void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException {
+		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+		Via via = sector
+				.getVias()
+				.stream()
+				.filter(v -> idVia.equals(v.getId()))
+				.findAny()
+				.orElseThrow(() -> new NoEncontradoException("sector", idVia));
+		sector.getVias().remove(via);
+		sectorRepository.save(sector);
+		viaRepository.delete(via);
+		
+	}
 	
 }
