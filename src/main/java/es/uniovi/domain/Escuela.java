@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,9 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
-public class Escuela {
+public class Escuela implements Serializable {
+
+	private static final long serialVersionUID = 8023830574582405343L;
 
 	@Id
 	@GeneratedValue

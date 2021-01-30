@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -17,7 +18,9 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "uq_usuario_nombre"))
-public class Usuario {
+public class Usuario implements Serializable {
+
+	private static final long serialVersionUID = 5481015999454416823L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

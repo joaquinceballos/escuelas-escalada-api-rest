@@ -1,42 +1,40 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.OrderColumn;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "via", "croquis" }, name = "UQ_TRAZO_VIA_CROQUIS_VIA"))
-public class TrazoVia {
+@IdClass(TrazoViaPK.class)
+public class TrazoVia implements Serializable {
+
+	private static final long serialVersionUID = 7095706231971332391L;
 	
 	@Id
-	@GeneratedValue
-	private Long id;
-
-	@ElementCollection
-	private List<Punto> puntos;
-	
 	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_TRAZO_VIA_VIA"))
 	private Via via;
 	
+	@Id
 	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_TRAZO_VIA_CROQUIS"))
 	private Croquis croquis;
+
+	@ElementCollection
+	@OrderColumn(name = "orden")
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_TRAZO_VIA_PUNTOS"))
+	private List<Punto> puntos;
 	
 	public TrazoVia() {
 		super();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public List<Punto> getPuntos() {
@@ -65,7 +63,7 @@ public class TrazoVia {
 
 	@Override
 	public String toString() {
-		return "TrazoVia [id=" + id + ", via=" + via + ", croquis=" + croquis + "]";
+		return "TrazoVia [via=" + via + ", croquis=" + croquis + "]";
 	}
 	
 }

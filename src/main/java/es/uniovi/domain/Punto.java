@@ -1,9 +1,13 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class Punto {
+public class Punto implements Serializable {
+
+	private static final long serialVersionUID = 7463609167239189416L;
 
 	private double x;
 

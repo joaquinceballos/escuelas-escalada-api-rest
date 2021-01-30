@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -13,7 +14,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-public class Rol {
+public class Rol implements Serializable {
+
+	private static final long serialVersionUID = -8591357215885726940L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

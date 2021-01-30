@@ -253,43 +253,44 @@ public class EscuelaController extends BaseController {
 		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
 	}
 	
-	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia")
+	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/via/{idVia}")
 	@ResponseStatus(code= HttpStatus.OK)
 	public ApiResponse<TrazoViaDto> addTrazoVia(
 			@PathVariable("idEscuela") @NotNull Long idEscuela,
 			@PathVariable("idSector") @NotNull Long idSector,
 			@PathVariable("idCroquis") @NotNull Long idCroquis,
+			@PathVariable("idVia") @NotNull Long idVia,
 			@RequestBody @Valid TrazoViaDto trazoViaDto) throws ServiceException {
-		TrazoVia trazoVia = escuelaService.addTrazoVia(idEscuela, idSector, idCroquis, toEntity(trazoViaDto));
+		TrazoVia trazoVia = escuelaService.addTrazoVia(idEscuela, idSector, idCroquis, idVia, toEntity(trazoViaDto));
 		return new ApiResponse<>(toDto(trazoVia), ApiResponseStatus.SUCCESS);
 	}
 
-	@PutMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia/{idTrazoVia}")
+	@PutMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/via/{idVia}")
 	@ResponseStatus(code= HttpStatus.OK)
 	public ApiResponse<TrazoViaDto> updateTrazoVia(
 			@PathVariable("idEscuela") @NotNull Long idEscuela,
 			@PathVariable("idSector") @NotNull Long idSector,
 			@PathVariable("idCroquis") @NotNull Long idCroquis,
-			@PathVariable("idTrazoVia") @NotNull Long idTrazoVia,
+			@PathVariable("idVia") @NotNull Long idVia,
 			@RequestBody @Valid TrazoViaDto trazoViaDto) throws ServiceException {
 		TrazoVia trazoVia = escuelaService.updateTrazoVia(
 				idEscuela,
 				idSector,
 				idCroquis,
-				idTrazoVia,
+				idVia,
 				toEntity(trazoViaDto));
 		return new ApiResponse<>(toDto(trazoVia), ApiResponseStatus.SUCCESS);
 	}
 	
-	@DeleteMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia/{idTrazoVia}")
-	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	@DeleteMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/via/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<Void> deleteTrazoVia(
 			@PathVariable("idEscuela") @NotNull Long idEscuela,
 			@PathVariable("idSector") @NotNull Long idSector,
 			@PathVariable("idCroquis") @NotNull Long idCroquis,
-			@PathVariable("idTrazoVia") @NotNull Long idTrazoVia) throws ServiceException {
-		escuelaService.deleteTrazoVia(idEscuela, idSector, idCroquis, idTrazoVia);
-		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
+			@PathVariable("idVia") @NotNull Long idVia) throws ServiceException {
+		escuelaService.deleteTrazoVia(idEscuela, idSector, idCroquis, idVia);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
 	}
 	
 	/**

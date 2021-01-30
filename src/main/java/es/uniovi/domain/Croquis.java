@@ -1,13 +1,16 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -16,13 +19,16 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "sector", "nombre" }, name = "UQ_CROQUIS_NOMBRE"))
-public class Croquis {
-	
+public class Croquis implements Serializable {
+
+	private static final long serialVersionUID = 8145877771457034636L;
+
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_CROQUIS_SECTOR"))
 	private Sector sector;	
 	
 	@OneToMany(mappedBy = "croquis",

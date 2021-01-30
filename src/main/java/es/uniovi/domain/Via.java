@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -18,7 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_VIA_NOMBRE_SECTOR", columnNames = { "NOMBRE", "SECTOR" }))
-public class Via {
+public class Via implements Serializable {
+
+	private static final long serialVersionUID = -6118720572978189595L;
 
 	@Id
 	@GeneratedValue

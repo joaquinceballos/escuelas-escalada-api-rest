@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +26,9 @@ import es.uniovi.validation.Coordenadas;
 @Entity
 @Coordenadas
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_SECTOR_NOMBRE_ESCUELA", columnNames = { "NOMBRE", "ESCUELA" }))
-public class Sector implements Ubicable {
+public class Sector implements Ubicable, Serializable {
+
+	private static final long serialVersionUID = 6121972409424227333L;
 
 	@Id
 	@GeneratedValue

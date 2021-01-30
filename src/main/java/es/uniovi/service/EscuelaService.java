@@ -211,11 +211,17 @@ public interface EscuelaService {
 	 * @param idEscuela El id de la escuela
 	 * @param idSector  El id del sector
 	 * @param idCroquis El id del croquis
+	 * @param idVia     El id de la vía
 	 * @param trazoVia  El trazo de vía
 	 * @return El trazo persistido
 	 * @throws ServiceException 
 	 */
-	TrazoVia addTrazoVia(Long idEscuela, Long idSector, Long idCroquis, TrazoVia trazoVia) throws ServiceException;
+	TrazoVia addTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			Long idVia, 
+			TrazoVia trazoVia) throws ServiceException;
 
 	/**
 	 * Actualiza el trazo de vía pasado
@@ -223,6 +229,7 @@ public interface EscuelaService {
 	 * @param idEscuela El id de la escuela
 	 * @param idSector  El id del sector
 	 * @param idCroquis El id del croquis
+	 * @param idVia     El id de la vía
 	 * @param trazoVia  El trazo de vía
 	 * @return El trazo actualizado
 	 * @throws NoEncontradoException
@@ -231,7 +238,7 @@ public interface EscuelaService {
 			Long idEscuela,
 			Long idSector,
 			Long idCroquis,
-			Long idTrazoVia,
+			Long idVia,
 			TrazoVia trazoVia) throws NoEncontradoException;
 
 	/**
@@ -240,13 +247,13 @@ public interface EscuelaService {
 	 * @param idEscuela El id de la escuela
 	 * @param idSector El id del sector
 	 * @param idCroquis El id del croquis
-	 * @param idTrazoVia El id del trazo de vía
+	 * @param idVia El id de la vía
 	 * @throws NoEncontradoException
 	 */
 	void deleteTrazoVia(
 			Long idEscuela,
 			Long idSector,
 			Long idCroquis,
-			Long idTrazoVia) throws NoEncontradoException;
+			Long idVia) throws NoEncontradoException;
 
 }
