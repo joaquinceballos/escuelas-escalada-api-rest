@@ -2,7 +2,8 @@
  * Inicializamos base de datos con usuarios y roles
  */
 
-/*
+
+
 --usuario admin
 insert
 	into
@@ -66,4 +67,4 @@ insert
 	rol_id)
 values(-2,
 -2);
-*/
+

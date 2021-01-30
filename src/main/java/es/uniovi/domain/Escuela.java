@@ -33,7 +33,7 @@ public class Escuela {
 	@OneToMany(fetch = FetchType.EAGER,
 	           orphanRemoval = true,
 	           mappedBy = "escuela",
-	           cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	           cascade = { CascadeType.ALL })
 	private Set<@NotNull Sector> sectores = new HashSet<>();
 
 	public Escuela() {

@@ -5,12 +5,15 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -50,6 +53,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 	
 	@Autowired
 	private ViaRepository viaRepository;
+	
+	@Autowired
+	private EntityManager entityManager;
 
 	@Override
 	public Page<Escuela> getEscuelas(Integer page, Integer size) {
@@ -62,17 +68,29 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Escuela addEscuela(Escuela escuela) throws ServiceException {
+	@Transactional
+	public Escuela addEscuela(Escuela escuela) throws RestriccionDatosException {
 		try {
 			escuela.setId(null);
 			for (Sector sector : escuela.getSectores()) {
 				asociaNuevoSector(escuela, sector);
 			}
-			escuelaRepository.save(escuela);
-			return escuela;
+			return doSaveEscuela(escuela);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
+	}
+
+	/**
+	 * Persiste la escuela pasada y todos sus sectores
+	 * 
+	 * @param escuela La nueva escuela
+	 * @return La escuela persistida
+	 */
+	private Escuela doSaveEscuela(Escuela escuela) {
+		Escuela saved = escuelaRepository.save(escuela);
+		//escuela.getSectores().forEach(this::doSaveSector);
+		return saved;
 	}
 
 	/**
@@ -115,17 +133,43 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
+	@Transactional
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
 		try {
 			asociaNuevoSector(doGetEscuela(idEscuela), sector);
-			return sectorRepository.save(sector);
+			doSaveSector(sector);
+			return sector;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
 	}
 
+	/**
+	 * Persiste el sector pasado y todas sus vías
+	 * 
+	 * @param sector El nuevo sector a persistir
+	 * @return El sector persistido
+	 */
+	private void doSaveSector(Sector sector) {
+		sectorRepository.save(sector);
+		sector.getVias().forEach(v -> viaRepository.save(v));
+	}
+
+	private Set<Via> clonaVias(Sector sector) {
+		return sector
+				.getVias()
+				.stream()
+				.map(via -> {
+					Via clon = new Via();
+					BeanUtils.copyProperties(via, clon);
+					clon.setSector(sector);
+					return clon;
+				})
+				.collect(Collectors.toSet());
+	}
+
 	@Override
-	public Set<Via> getVias(Long idEscuela, Long idSector) throws ServiceException {
+	public Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException {
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = doGetSectorDeEscuela(idSector, escuela);
 		return sector.getVias();
@@ -199,17 +243,23 @@ public class EscuelaServiceImpl implements EscuelaService {
 		} 
 	}
 
-	@Transactional
 	private Escuela doActualizaEscuela(Escuela escuela) {
+		Set<Via> vias = new HashSet<>();
 		for (Sector sector : escuela.getSectores()) {
 			sector.setEscuela(escuela);
-			sectorRepository.saveAndFlush(sector);
+			// sectorRepository.save(sector);
 			for (Via via : sector.getVias()) {
 				via.setSector(sector);
-				viaRepository.saveAndFlush(via);
+				// viaRepository.save(via);
 			}
+			vias.addAll(clonaVias(sector));
 		}
-		return escuelaRepository.save(escuela);
+		Escuela saved = escuelaRepository.save(escuela);
+//		entityManager.merge(saved);
+//		for (Via via : vias) {
+//			viaRepository.save(via);
+//		}
+		return saved;
 	}
 
 	/**

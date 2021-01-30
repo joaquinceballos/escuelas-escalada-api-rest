@@ -79,7 +79,7 @@ public interface EscuelaService {
 	 * @return La lista de las vías del sector
 	 * @throws ServiceException
 	 */
-	Set<Via> getVias(Long idEscuela, Long idSector) throws ServiceException;
+	Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException;
 
 	/**
 	 * Obtiene la vía cuya id es pasada
