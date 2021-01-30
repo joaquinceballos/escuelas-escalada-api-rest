@@ -68,3 +68,17 @@ insert
 values(-2,
 -2);
 
+-- privilegios
+insert into privilegio(id, nombre) values(-1, "ESCRITURA");
+insert into privilegio(id, nombre) values(-2, "LECTURA");
+insert into privilegio(id, nombre) values(-3, "BORRADO");
+
+-- privilegios de ADMIN
+insert into rol_privilegio(rol_id, privilegio_id) values(-1, -1);
+insert into rol_privilegio(rol_id, privilegio_id) values(-1, -2);
+insert into rol_privilegio(rol_id, privilegio_id) values(-1, -3);
+
+--privilegios de USER
+insert into rol_privilegio(rol_id, privilegio_id) values(-2, -1);
+insert into rol_privilegio(rol_id, privilegio_id) values(-2, -2);
+

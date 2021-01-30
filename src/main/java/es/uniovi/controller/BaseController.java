@@ -29,10 +29,12 @@ import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
+import es.uniovi.domain.Ascension;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
+import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
 import es.uniovi.dto.UsuarioDto;
@@ -208,6 +210,27 @@ public abstract class BaseController {
 
 	private List<UsuarioDto> toUsuariosDto(List<Usuario> usuarios) {
 		return usuarios.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected ListaPaginada<AscensionDto> pageAscensionToDto(Page<Ascension> ascensiones) {
+		ListaPaginada<AscensionDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(ascensiones.getSize());
+		listaPaginada.setPage(ascensiones.getNumber());
+		listaPaginada.setTotalPaginas(ascensiones.getTotalPages());		
+		listaPaginada.setContenido(toAscencionesDto(ascensiones.getContent()));
+		return listaPaginada;		
+	}
+
+	private List<AscensionDto> toAscencionesDto(List<Ascension> ascensiones) {
+		return ascensiones.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected AscensionDto toDto(Ascension ascension) {
+		return modelMapper.map(ascension, AscensionDto.class);
+	}
+	
+	protected Ascension toEntity(AscensionDto ascensionDto) {
+		return modelMapper.map(ascensionDto, Ascension.class);		
 	}
 	
 }

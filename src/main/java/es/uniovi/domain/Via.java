@@ -1,11 +1,14 @@
 package es.uniovi.domain;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
@@ -37,6 +40,9 @@ public class Via {
 	@ManyToOne(optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_VIA_SECTOR"))
 	private Sector sector;
+	
+	@OneToMany(mappedBy = "via")
+	private List<Ascension> ascenciones;
 
 	public Via() {
 		super();
@@ -88,6 +94,14 @@ public class Via {
 
 	public void setSector(Sector sector) {
 		this.sector = sector;
+	}
+
+	public List<Ascension> getAscenciones() {
+		return ascenciones;
+	}
+
+	public void setAscenciones(List<Ascension> ascenciones) {
+		this.ascenciones = ascenciones;
 	}
 
 	@Override
