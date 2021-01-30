@@ -27,9 +27,13 @@ import com.github.fge.jsonpatch.JsonPatch;
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
+import es.uniovi.domain.Croquis;
+import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
+import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
@@ -210,7 +214,84 @@ public class EscuelaController extends BaseController {
 		escuelaService.deleteSector(idEscuela, idSector);
 		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
 	}
+	
+	@GetMapping("/{idEscuela}/sectores/{idSector}/croquis")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<List<CroquisDto>> getCroquis(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector) throws ServiceException {
+		List<CroquisDto> croquis = toCroquisDto(escuelaService.getCroquis(idEscuela, idSector));
+		return new ApiResponse<>(croquis, ApiResponseStatus.SUCCESS);
+	}
 
+	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<CroquisDto> addCroquis(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector,
+			@RequestBody @Valid CroquisDto croquisDto) throws ServiceException {
+		Croquis croquis = escuelaService.addCroquis(idEscuela, idSector, toEntity(croquisDto));
+		return new ApiResponse<>(toDto(croquis), ApiResponseStatus.SUCCESS);
+	}
+
+	/**
+	 * Elimina el croquis cuya id es pasasda
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idCroquis La id del croquis
+	 * @return Response con el resultado de la operación
+	 * @throws ServiceException
+	 */
+	@DeleteMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<Void> deleteCroquis(
+			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+			@PathVariable(name = "idSector") @NotNull Long idSector,
+			@PathVariable(name = "idCroquis") @NotNull Long idCroquis) throws ServiceException {
+		escuelaService.deleteCroquis(idEscuela, idSector, idCroquis);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
+	}
+	
+	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<TrazoViaDto> addTrazoVia(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector,
+			@PathVariable("idCroquis") @NotNull Long idCroquis,
+			@RequestBody @Valid TrazoViaDto trazoViaDto) throws ServiceException {
+		TrazoVia trazoVia = escuelaService.addTrazoVia(idEscuela, idSector, idCroquis, toEntity(trazoViaDto));
+		return new ApiResponse<>(toDto(trazoVia), ApiResponseStatus.SUCCESS);
+	}
+
+	@PutMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia/{idTrazoVia}")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<TrazoViaDto> updateTrazoVia(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector,
+			@PathVariable("idCroquis") @NotNull Long idCroquis,
+			@PathVariable("idTrazoVia") @NotNull Long idTrazoVia,
+			@RequestBody @Valid TrazoViaDto trazoViaDto) throws ServiceException {
+		TrazoVia trazoVia = escuelaService.updateTrazoVia(
+				idEscuela,
+				idSector,
+				idCroquis,
+				idTrazoVia,
+				toEntity(trazoViaDto));
+		return new ApiResponse<>(toDto(trazoVia), ApiResponseStatus.SUCCESS);
+	}
+	
+	@DeleteMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/trazoVia/{idTrazoVia}")
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public ApiResponse<Void> deleteTrazoVia(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector,
+			@PathVariable("idCroquis") @NotNull Long idCroquis,
+			@PathVariable("idTrazoVia") @NotNull Long idTrazoVia) throws ServiceException {
+		escuelaService.deleteTrazoVia(idEscuela, idSector, idCroquis, idTrazoVia);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
+	}
+	
 	/**
 	 * Retorna la lista de vías del sector pasado
 	 * 
@@ -225,7 +306,7 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "idEscuela") Long idEscuela,
 			@PathVariable(name = "idSector") Long idSector) throws ServiceException {
 		return new ApiResponse<>(toViasDto(escuelaService.getVias(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
-	}
+	}	
 
 	/**
 	 * Retorna la vía cuya id es pasada

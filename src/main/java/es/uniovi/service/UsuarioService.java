@@ -1,14 +1,8 @@
 package es.uniovi.service;
 
-import java.util.List;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
 import org.springframework.data.domain.Page;
 
 import es.uniovi.domain.Ascension;
-import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Usuario;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -74,6 +68,15 @@ public interface UsuarioService {
 	 */
 	Ascension addAscension(Long idUsuario, Long idVia, Ascension ascension) throws NoEncontradoException;
 
-	Ascension updateAscension(Long idUsuario, Long idVia, Ascension entity) throws NoEncontradoException;
+	/**
+	 * Actualiza la ascensión pasada
+	 * 
+	 * @param idUsuario El id del usuario
+	 * @param idVia     El id de la vía
+	 * @param ascension La ascensión
+	 * @return La ascensión persistida
+	 * @throws NoEncontradoException
+	 */
+	Ascension updateAscension(Long idUsuario, Long idVia, Ascension ascension) throws NoEncontradoException;
 
 }

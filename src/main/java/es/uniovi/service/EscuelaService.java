@@ -1,13 +1,16 @@
 package es.uniovi.service;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
 import com.github.fge.jsonpatch.JsonPatch;
 
+import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
+import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.ServiceException;
@@ -129,7 +132,6 @@ public interface EscuelaService {
 	 */
 	void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException;
 
-	
 	/**
 	 * Borra la vía cuya id es pasada
 	 * 
@@ -172,5 +174,79 @@ public interface EscuelaService {
 	 * @throws NoEncontradoException
 	 */
 	Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via) throws NoEncontradoException;
+
+	/**
+	 * Obtiene los croquis del sector pasado
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @return La lista de croquis del sector
+	 * @throws NoEncontradoException
+	 */
+	List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException;
+
+	/**
+	 * Añade nuevo Croquis al sector
+	 * 
+	 * @param idEscuela El id de las escuela
+	 * @param idSector  El id del sector
+	 * @param croquis   El croquis
+	 * @return El croquis persistido
+	 * @throws ServiceException 
+	 */
+	Croquis addCroquis(Long idEscuela, Long idSector, Croquis croquis) throws ServiceException;
+
+	/**
+	 * Borra el croquis cuya id es pasada
+	 * 
+	 * @param idEscuela El id de las escuela
+	 * @param idSector  El id del sector
+	 * @param idCroquis El id el croquis
+	 */
+	void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException;
+
+	/**
+	 * Añade nuevo trazo de vía al croquis
+	 * 
+	 * @param idEscuela El id de la escuela
+	 * @param idSector  El id del sector
+	 * @param idCroquis El id del croquis
+	 * @param trazoVia  El trazo de vía
+	 * @return El trazo persistido
+	 * @throws ServiceException 
+	 */
+	TrazoVia addTrazoVia(Long idEscuela, Long idSector, Long idCroquis, TrazoVia trazoVia) throws ServiceException;
+
+	/**
+	 * Actualiza el trazo de vía pasado
+	 * 
+	 * @param idEscuela El id de la escuela
+	 * @param idSector  El id del sector
+	 * @param idCroquis El id del croquis
+	 * @param trazoVia  El trazo de vía
+	 * @return El trazo actualizado
+	 * @throws NoEncontradoException
+	 */
+	TrazoVia updateTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			Long idTrazoVia,
+			TrazoVia trazoVia) throws NoEncontradoException;
+
+	/**
+	 * Borra el trazo de vía cuya id es pasada
+	 * 
+	 * @param idEscuela El id de la escuela
+	 * @param idSector El id del sector
+	 * @param idCroquis El id del croquis
+	 * @param idTrazoVia El id del trazo de vía
+	 * @throws NoEncontradoException
+	 */
+	void deleteTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			Long idTrazoVia) throws NoEncontradoException;
 
 }

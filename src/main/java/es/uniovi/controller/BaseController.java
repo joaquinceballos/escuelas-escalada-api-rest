@@ -1,5 +1,6 @@
 package es.uniovi.controller;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,13 +31,17 @@ import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
+import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.dto.AscensionDto;
+import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
@@ -233,4 +238,28 @@ public abstract class BaseController {
 		return modelMapper.map(ascensionDto, Ascension.class);		
 	}
 	
+	protected CroquisDto toDto(Croquis croquis) {
+		CroquisDto croquisDto = modelMapper.map(croquis, CroquisDto.class);
+		croquisDto.setImagen(Base64.getEncoder().encodeToString((croquis.getImagen())));
+		return croquisDto;
+	}
+	
+	protected List<CroquisDto> toCroquisDto(List<Croquis> croquis) {
+		return croquis.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected Croquis toEntity(CroquisDto croquisDto) {
+		Croquis croquis = modelMapper.map(croquisDto, Croquis.class);
+		croquis.setImagen(Base64.getDecoder().decode(croquisDto.getImagen()));
+		return croquis;
+	}
+	
+	protected TrazoVia toEntity(TrazoViaDto trazoViaDto) {
+		return modelMapper.map(trazoViaDto, TrazoVia.class);
+	}
+	
+	protected TrazoViaDto toDto(TrazoVia trazoVia) {
+		return modelMapper.map(trazoVia, TrazoViaDto.class);
+	}
+
 }

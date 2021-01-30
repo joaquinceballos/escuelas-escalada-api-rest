@@ -1,13 +1,13 @@
 package es.uniovi.service.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -27,15 +27,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 
+import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
+import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.repository.CroquisRepository;
 import es.uniovi.repository.EscuelaRepository;
 import es.uniovi.repository.SectorRepository;
+import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
 import es.uniovi.service.EscuelaService;
 
@@ -55,8 +59,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	private ViaRepository viaRepository;
 	
 	@Autowired
-	private EntityManager entityManager;
+	private CroquisRepository croquisRepository;
 
+	@Autowired
+	private TrazoViaRepository trazoViaRepository;
+	
 	@Override
 	public Page<Escuela> getEscuelas(Integer page, Integer size) {
 		return escuelaRepository.findAll(PageRequest.of(page, size, Sort.by("nombre")));
@@ -395,6 +402,118 @@ public class EscuelaServiceImpl implements EscuelaService {
 		via.setNombre(via2.getNombre());
 		via.setNumeroChapas(via2.getNumeroChapas());
 		return viaRepository.save(via);
+	}
+
+	@Override
+	public List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		return croquisRepository.findBySector(sector);
+	}
+
+	@Override
+	public Croquis addCroquis(Long idEscuela, Long idSector, Croquis croquis) throws ServiceException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		croquis.setSector(sector);
+		try {
+			return croquisRepository.save(croquis);
+		} catch (DataIntegrityViolationException e) {
+			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		}
+	}
+
+	@Override
+	public void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		Croquis croquis = sector
+			.getCroquis()
+			.stream()
+			.filter(c -> c.getId().equals(idCroquis))
+			.findAny()
+			.orElseThrow(() -> new NoEncontradoException(
+					"escuela/sector/croquis",
+					idEscuela + "/" + idSector + "/" + idCroquis));
+		croquisRepository.delete(croquis);		
+	}
+
+	@Override
+	public TrazoVia addTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			TrazoVia trazoVia) throws ServiceException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		Croquis croquis = doGetCroquisSector(idCroquis, sector);
+		trazoVia.setCroquis(croquis);
+		try {
+			return trazoViaRepository.save(trazoVia);
+		} catch (DataIntegrityViolationException e) {
+			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		}
+	}
+
+	private Croquis doGetCroquisSector(Long idCroquis, Sector sector) throws NoEncontradoException {
+		if (sector.getCroquis() == null ||
+				sector
+				.getCroquis()
+				.stream()
+				.map(Croquis::getId)
+				.filter(Objects::nonNull)
+				.filter(id -> id.equals(idCroquis))
+				.count() == 0) {
+			throw new NoEncontradoException("sector/croquis", sector.getId() + "/" + idCroquis);
+		}
+		return croquisRepository.findById(idCroquis).orElseThrow(INCONSISTENCIA_EXCEPTION_SUPPLIER);
+	}
+
+	@Override
+	public TrazoVia updateTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			Long idTrazoVia,
+			TrazoVia trazoViaActualizado) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		Croquis croquis = doGetCroquisSector(idCroquis, sector);
+		TrazoVia trazoVia = doGetTrazoViaSector(idTrazoVia, croquis);
+		trazoVia.setPuntos(trazoViaActualizado.getPuntos());
+		return trazoViaRepository.save(trazoVia);
+	}
+
+	private TrazoVia doGetTrazoViaSector(Long idTrazoVia, Croquis croquis) throws NoEncontradoException {
+		if (croquis
+				.getTrazos()
+				.stream()
+				.map(TrazoVia::getId)
+				.filter(Objects::nonNull)
+				.filter(id -> id.equals(idTrazoVia))
+				.count() == 0) {
+			throw new NoEncontradoException("croquis/trazoVia", croquis.getId() + "/" + idTrazoVia);
+		}
+		return trazoViaRepository.findById(idTrazoVia).orElseThrow(INCONSISTENCIA_EXCEPTION_SUPPLIER);
+	}
+
+	@Override
+	public void deleteTrazoVia(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			Long idTrazoVia) throws NoEncontradoException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		Sector sector = doGetSectorDeEscuela(idSector, escuela);
+		Croquis croquis = doGetCroquisSector(idCroquis, sector);
+		TrazoVia trazoVia = trazoViaRepository
+				.findById(idTrazoVia)
+				.orElseThrow(() -> new NoEncontradoException("trazoVia", idTrazoVia));
+		if (trazoVia.getCroquis().equals(croquis)) {
+			trazoViaRepository.delete(trazoVia);
+		} else {
+			throw new NoEncontradoException("croquis/trazoVia", idCroquis + "/" + idTrazoVia);
+		}		
 	}
 	
 }

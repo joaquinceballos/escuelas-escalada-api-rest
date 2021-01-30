@@ -51,6 +51,14 @@ public class Sector implements Ubicable {
 	           cascade = { CascadeType.REMOVE })
 	private Set<@NotNull Via> vias = new HashSet<>();
 
+	@NotNull
+	@OrderBy("id")
+	@OneToMany(mappedBy = "sector",
+	           orphanRemoval = true,
+	           fetch = FetchType.EAGER,
+	           cascade = { CascadeType.REMOVE })
+	private Set<@NotNull Croquis> croquis = new HashSet<>();	
+
 	public Sector() {
 		super();
 	}
@@ -101,6 +109,14 @@ public class Sector implements Ubicable {
 
 	public void setVias(Set<Via> vias) {
 		this.vias = vias;
+	}
+
+	public Set<Croquis> getCroquis() {
+		return croquis;
+	}
+
+	public void setCroquis(Set<Croquis> croquis) {
+		this.croquis = croquis;
 	}
 
 	@Override

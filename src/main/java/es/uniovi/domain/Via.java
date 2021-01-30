@@ -41,8 +41,13 @@ public class Via {
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_VIA_SECTOR"))
 	private Sector sector;
 	
-	@OneToMany(mappedBy = "via")
+	@OneToMany(mappedBy = "via",
+	           orphanRemoval = true)
 	private List<Ascension> ascenciones;
+	
+	@OneToMany(mappedBy = "via",
+	           orphanRemoval = true)
+	private List<TrazoVia> trazos;
 
 	public Via() {
 		super();
@@ -102,6 +107,14 @@ public class Via {
 
 	public void setAscenciones(List<Ascension> ascenciones) {
 		this.ascenciones = ascenciones;
+	}
+
+	public List<TrazoVia> getTrazos() {
+		return trazos;
+	}
+
+	public void setTrazos(List<TrazoVia> trazos) {
+		this.trazos = trazos;
 	}
 
 	@Override
