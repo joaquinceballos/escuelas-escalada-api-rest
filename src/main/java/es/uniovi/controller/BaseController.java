@@ -1,6 +1,6 @@
 package es.uniovi.controller;
 
-import java.util.Base64;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +13,11 @@ import javax.validation.ConstraintViolationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,15 +46,21 @@ import es.uniovi.dto.SectorDto;
 import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
+import es.uniovi.exception.ImagenNoValidaException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
+import es.uniovi.service.ImagenService;
 
+@Controller
 public abstract class BaseController {
 	
     private static final Logger logger = LogManager.getLogger(BaseController.class);
 
 	private ModelMapper modelMapper = new ModelMapper();
+	
+	@Autowired
+	private ImagenService imagenService;
 
 	///////////////////////////////
 	//// manejo de excepciones ////
@@ -99,6 +107,14 @@ public abstract class BaseController {
 		Map<String, Object> errors = new HashMap<>();
 		errors.put("recurso", e.getRecurso());
 		errors.put("valor", e.getValor());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ImagenNoValidaException.class)
+	protected ApiResponse<Map<String, Object>> handleException(ImagenNoValidaException e) {
+		Map<String, Object> errors = new HashMap<>();
+		errors.put("imagen no válida", e.getMessage());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
 	
@@ -238,19 +254,23 @@ public abstract class BaseController {
 		return modelMapper.map(ascensionDto, Ascension.class);		
 	}
 	
-	protected CroquisDto toDto(Croquis croquis) {
+	protected CroquisDto toDto(Croquis croquis) throws ImagenNoValidaException {
 		CroquisDto croquisDto = modelMapper.map(croquis, CroquisDto.class);
-		croquisDto.setImagen(Base64.getEncoder().encodeToString((croquis.getImagen())));
+		croquisDto.setImagen(imagenService.toBase64(croquis.getImagen()));
 		return croquisDto;
 	}
 	
-	protected List<CroquisDto> toCroquisDto(List<Croquis> croquis) {
-		return croquis.stream().map(this::toDto).collect(Collectors.toList());
+	protected List<CroquisDto> toCroquisDto(List<Croquis> croquis) throws ImagenNoValidaException {
+		List<CroquisDto> croquisList = new ArrayList<>();
+		for (Croquis c : croquis) {
+			croquisList.add(toDto(c));
+		}
+		return croquisList;
 	}
 	
-	protected Croquis toEntity(CroquisDto croquisDto) {
+	protected Croquis toEntity(CroquisDto croquisDto) throws ImagenNoValidaException {
 		Croquis croquis = modelMapper.map(croquisDto, Croquis.class);
-		croquis.setImagen(Base64.getDecoder().decode(croquisDto.getImagen()));
+		croquis.setImagen(imagenService.toBytes(croquisDto.getImagen()));
 		return croquis;
 	}
 	

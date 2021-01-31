@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -42,6 +43,7 @@ import es.uniovi.repository.SectorRepository;
 import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
 import es.uniovi.service.EscuelaService;
+import es.uniovi.service.ImagenService;
 
 @Service
 public class EscuelaServiceImpl implements EscuelaService {
@@ -63,6 +65,8 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Autowired
 	private TrazoViaRepository trazoViaRepository;
+	
+	@Autowired ImagenService imagenService;
 	
 	@Override
 	public Page<Escuela> getEscuelas(Integer page, Integer size) {
@@ -414,6 +418,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	public Croquis addCroquis(Long idEscuela, Long idSector, Croquis croquis) throws ServiceException {
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		croquis.setSector(sector);
+		imagenService.checkImagen(croquis.getImagen());
 		try {
 			return croquisRepository.save(croquis);
 		} catch (DataIntegrityViolationException e) {
