@@ -21,10 +21,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 
@@ -53,6 +55,7 @@ import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.service.ImagenService;
 
 @Controller
+@CrossOrigin(origins = "*") // TODO acotar los origins
 public abstract class BaseController {
 	
     private static final Logger logger = LogManager.getLogger(BaseController.class);
@@ -140,7 +143,12 @@ public abstract class BaseController {
 		} else if (e.getCause() instanceof InvalidTypeIdException) {
 			InvalidTypeIdException invalidTypeIdException = (InvalidTypeIdException) e.getCause();
 			errors.put("tipo", invalidTypeIdException.getTypeId());
+		} else if (e.getCause() instanceof JsonParseException) {
+			JsonParseException jsonParseException = (JsonParseException) e.getCause();
+			errors.put("request payload", jsonParseException.getRequestPayloadAsString());
+			errors.put("Mensage original", jsonParseException.getOriginalMessage());
 		}
+		errors.put("error", e.getLocalizedMessage());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
 	
@@ -263,7 +271,9 @@ public abstract class BaseController {
 	protected List<CroquisDto> toCroquisDto(List<Croquis> croquis) throws ImagenNoValidaException {
 		List<CroquisDto> croquisList = new ArrayList<>();
 		for (Croquis c : croquis) {
-			croquisList.add(toDto(c));
+			CroquisDto dto = toDto(c);
+			dto.setImagen(null); // las listas de DTO de croquis no tendrán imágen
+			croquisList.add(dto);
 		}
 		return croquisList;
 	}
@@ -271,6 +281,7 @@ public abstract class BaseController {
 	protected Croquis toEntity(CroquisDto croquisDto) throws ImagenNoValidaException {
 		Croquis croquis = modelMapper.map(croquisDto, Croquis.class);
 		croquis.setImagen(imagenService.toBytes(croquisDto.getImagen()));
+		croquis.setFormatoImagen(imagenService.getFormatoImagen(croquisDto.getImagen()));
 		return croquis;
 	}
 	

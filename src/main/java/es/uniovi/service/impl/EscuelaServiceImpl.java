@@ -13,7 +13,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 
-import org.apache.tika.Tika;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -148,6 +147,10 @@ public class EscuelaServiceImpl implements EscuelaService {
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
 		try {
 			asociaNuevoSector(doGetEscuela(idEscuela), sector);
+			if (sectorRepository.existsByEscuelaAndNombre(sector.getEscuela(), sector.getNombre())) {
+				throw new RestriccionDatosException(
+						String.format("Nombre de sector ya existe en la escuela %s", sector.getEscuela().getId()));
+			}
 			doSaveSector(sector);
 			return sector;
 		} catch (DataIntegrityViolationException e) {
@@ -415,6 +418,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
+	public Croquis getCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException {
+		return doGetCroquisSector(idCroquis, doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela)));
+	}
+
+	@Override
 	public Croquis addCroquis(Long idEscuela, Long idSector, Croquis croquis) throws ServiceException {
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		croquis.setSector(sector);
@@ -452,6 +460,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 		Croquis croquis = doGetCroquisSector(idCroquis, sector);
 		trazoVia.setCroquis(croquis);
 		trazoVia.setVia(via);
+		if (trazoViaRepository.existsByCroquisAndVia(croquis, via)) {
+			throw new RestriccionDatosException("ya existe el trazo para croquis/via: " + idCroquis + "/" + idVia);
+		}
 		try {
 			return trazoViaRepository.save(trazoVia);
 		} catch (DataIntegrityViolationException e) {

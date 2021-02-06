@@ -43,13 +43,14 @@ public class ImagenServiceImpl implements ImagenService {
 		}
 	}
 
-	private void checkFormato(byte[] bytes) throws ImagenNoValidaException {
+	private String checkFormato(byte[] bytes) throws ImagenNoValidaException {
 		int n = bytes.length;
 		byte[] primerosBytes = Arrays.copyOf(bytes, Math.min(n, 2000));
 		String tipo = new Tika().detect(primerosBytes);
 		if(!tiposImagenValidos.contains(tipo)) {
 			throw new ImagenNoValidaException("Formato de imagen no aceptado: " + tipo);
 		}
+		return tipo;
 	}
 
 	@Override
@@ -65,6 +66,11 @@ public class ImagenServiceImpl implements ImagenService {
 	@Override
 	public void checkImagen(String base64) throws ImagenNoValidaException {
 		check(toBytes(base64));
+	}
+
+	@Override
+	public String getFormatoImagen(String base64) throws ImagenNoValidaException {
+		return checkFormato(toBytes(base64));
 	}
 
 }

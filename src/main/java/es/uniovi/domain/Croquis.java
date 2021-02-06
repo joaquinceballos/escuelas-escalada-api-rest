@@ -42,6 +42,8 @@ public class Croquis implements Serializable {
 	
 	@Basic(optional = false)
 	private String nombre;
+	
+	private String formatoImagen;
 
 	public Croquis() {
 		super();
@@ -86,7 +88,15 @@ public class Croquis implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+	
+	public String getFormatoImagen() {
+		return formatoImagen;
+	}
 
+	public void setFormatoImagen(String formatoImagen) {
+		this.formatoImagen = formatoImagen;		
+	}
+	
 	@Override
 	public String toString() {
 		return "Croquis [id=" + id + ", sector=" + sector + ", nombre=" + nombre + "]";

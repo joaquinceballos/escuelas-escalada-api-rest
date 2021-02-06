@@ -3,6 +3,8 @@ package es.uniovi.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.domain.Page;
 
 import com.github.fge.jsonpatch.JsonPatch;
@@ -184,6 +186,17 @@ public interface EscuelaService {
 	 * @throws NoEncontradoException
 	 */
 	List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException;
+	
+	/**
+	 * Obtiene el croquis pasado
+	 * 
+	 * @param idEscuela El id de la escuela
+	 * @param idSector  El id del sector
+	 * @param idCroquis El id del croquis
+	 * @return El croquis
+	 * @throws NoEncontradoException
+	 */
+	Croquis getCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException;
 
 	/**
 	 * Añade nuevo Croquis al sector

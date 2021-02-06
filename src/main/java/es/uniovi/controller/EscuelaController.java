@@ -223,6 +223,16 @@ public class EscuelaController extends BaseController {
 		List<CroquisDto> croquis = toCroquisDto(escuelaService.getCroquis(idEscuela, idSector));
 		return new ApiResponse<>(croquis, ApiResponseStatus.SUCCESS);
 	}
+	
+	@GetMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}")
+	@ResponseStatus(code= HttpStatus.OK)
+	public ApiResponse<CroquisDto> getCroquis(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idSector") @NotNull Long idSector,
+			@PathVariable("idCroquis") @NotNull Long idCroquis) throws ServiceException {
+		CroquisDto croquis = toDto(escuelaService.getCroquis(idEscuela, idSector, idCroquis));
+		return new ApiResponse<>(croquis, ApiResponseStatus.SUCCESS);
+	}	
 
 	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis")
 	@ResponseStatus(code= HttpStatus.OK)

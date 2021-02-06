@@ -38,4 +38,13 @@ public interface ImagenService {
 	 */
 	void checkImagen(String base64) throws ImagenNoValidaException;
 
+	/**
+	 * Retorna el tipo de formato de la imagen pasada
+	 * 
+	 * @param base64 Imagen codificada
+	 * @return El tipo de formato de la imagen
+	 * @throws ImagenNoValidaException Si el formato no es válido
+	 */
+	String getFormatoImagen(String base64) throws ImagenNoValidaException;
+
 }

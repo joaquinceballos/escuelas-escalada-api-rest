@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 public class CroquisDto {
 
 	private Long id;
@@ -12,10 +15,13 @@ public class CroquisDto {
 
 	private List<TrazoViaDto> trazos;
 
+	@JsonInclude(Include.NON_NULL)
 	private String imagen;
 
 	@NotBlank
 	private String nombre;
+	
+	private String formatoImagen;
 
 	public CroquisDto() {
 		super();
@@ -55,6 +61,14 @@ public class CroquisDto {
 
 	public String getNombre() {
 		return nombre;
+	}	
+	
+	public String getFormatoImagen() {
+		return formatoImagen;
+	}
+
+	public void setFormatoImagen(String formatoImagen) {
+		this.formatoImagen = formatoImagen;
 	}
 
 	@Override
