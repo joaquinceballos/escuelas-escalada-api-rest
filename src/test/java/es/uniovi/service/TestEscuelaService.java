@@ -243,13 +243,13 @@ class TestEscuelaService {
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector("", null, null)));
 		assertThrows(TransactionSystemException.class,
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector(null, null, null)));
-		assertThrows(DataIntegrityViolationException.class,
+		assertThrows(RestriccionDatosException.class,
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector("sector1", null, null)));
-		assertThrows(TransactionSystemException.class,
+		assertThrows(RestriccionDatosException.class,
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector("sector2", 90.01, 0.)));
-		assertThrows(TransactionSystemException.class,
+		assertThrows(RestriccionDatosException.class,
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector("sector2", 0., -180.01)));
-		assertThrows(TransactionSystemException.class,
+		assertThrows(RestriccionDatosException.class,
 				() -> escuelaService.addSector(escuela1.getId(), nuevoSector("sector2", null, 0.)));
 		
 		// No permite añadir sector con vía inválida
