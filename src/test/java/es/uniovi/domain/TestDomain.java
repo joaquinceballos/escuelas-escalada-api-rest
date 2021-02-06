@@ -81,7 +81,6 @@ class TestDomain {
 		assertEquals(1.0, via.getLongitud());
 		assertEquals("nombre", via.getNombre());
 		assertEquals(1, via.getNumeroChapas());
-		assertEquals(new Sector(), via.getSector());
 		assertNotNull(via.toString());
 		assertNotNull(via.hashCode());
 		assertNotEquals(new Via(), via);

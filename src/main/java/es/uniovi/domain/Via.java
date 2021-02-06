@@ -1,33 +1,56 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_VIA_NOMBRE_SECTOR", columnNames = { "NOMBRE", "SECTOR" }))
-public class Via {
+public class Via implements Serializable {
+
+	private static final long serialVersionUID = -6118720572978189595L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
+	@NotBlank
 	private String nombre;
 
+	@NotBlank
 	private String grado; // TODO se debé validar el grado??
 
+	@Min(0)
 	private Integer numeroChapas;
 
+	@Min(0)
 	private Double longitud;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_VIA_SECTOR"))
 	private Sector sector;
+	
+	@OneToMany(mappedBy = "via",
+	           orphanRemoval = true)
+	private List<Ascension> ascenciones;
+	
+	@OneToMany(mappedBy = "via",
+	           orphanRemoval = true)
+	private List<TrazoVia> trazos;
 
 	public Via() {
 		super();
@@ -81,6 +104,22 @@ public class Via {
 		this.sector = sector;
 	}
 
+	public List<Ascension> getAscenciones() {
+		return ascenciones;
+	}
+
+	public void setAscenciones(List<Ascension> ascenciones) {
+		this.ascenciones = ascenciones;
+	}
+
+	public List<TrazoVia> getTrazos() {
+		return trazos;
+	}
+
+	public void setTrazos(List<TrazoVia> trazos) {
+		this.trazos = trazos;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -99,8 +138,7 @@ public class Via {
 			return false;
 		Via other = (Via) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
+			return false;
 		} else if (!id.equals(other.id))
 			return false;
 		return true;

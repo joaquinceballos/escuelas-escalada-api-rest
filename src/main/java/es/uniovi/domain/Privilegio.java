@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -9,7 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 @Entity
-public class Privilegio {
+public class Privilegio implements Serializable {
+
+	private static final long serialVersionUID = 568876450650919715L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

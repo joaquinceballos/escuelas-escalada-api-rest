@@ -1,5 +1,6 @@
 package es.uniovi.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -15,7 +16,7 @@ public class EscuelaDto {
 	private String nombre;
 
 	@JsonInclude(Include.NON_NULL)
-	private List<SectorDto> sectores;
+	private List<SectorDto> sectores = new ArrayList<>();
 
 	public Long getId() {
 		return id;

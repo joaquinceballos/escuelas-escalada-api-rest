@@ -1,5 +1,6 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,12 +12,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "uq_usuario_nombre"))
-public class Usuario {
+public class Usuario implements Serializable {
+
+	private static final long serialVersionUID = 5481015999454416823L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,6 +42,9 @@ public class Usuario {
 	                                            foreignKey = @ForeignKey(name = "fk_usurio_rol_rol")),
 	           uniqueConstraints = @UniqueConstraint(name = "uq_usuario_rol", columnNames = { "usuario_id", "rol_id" }))
 	private List<Rol> roles;
+	
+	@OneToMany(mappedBy = "usuario")
+	private List<Ascension> ascenciones;
 
 	public Usuario() {
 		super();
@@ -81,6 +88,14 @@ public class Usuario {
 
 	public void setRoles(List<Rol> roles) {
 		this.roles = roles;
+	}
+
+	public List<Ascension> getAscenciones() {
+		return ascenciones;
+	}
+
+	public void setAscenciones(List<Ascension> ascenciones) {
+		this.ascenciones = ascenciones;
 	}
 
 	@Override
