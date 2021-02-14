@@ -2,8 +2,6 @@
  * Inicializamos base de datos con usuarios y roles
  */
 
-
-/*
 --usuario admin
 insert
 	into
@@ -81,5 +79,5 @@ insert into rol_privilegio(rol_id, privilegio_id) values(-1, -3);
 --privilegios de USER
 insert into rol_privilegio(rol_id, privilegio_id) values(-2, -1);
 insert into rol_privilegio(rol_id, privilegio_id) values(-2, -2);
-*/
+
 
