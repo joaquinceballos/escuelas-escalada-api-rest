@@ -14,3 +14,5 @@ target/
 .sts4-cache
 .mvn/
 /mvnw*
+.dbeaver/
+Scripts/
