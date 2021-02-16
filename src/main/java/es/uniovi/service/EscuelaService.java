@@ -3,8 +3,6 @@ package es.uniovi.service;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.data.domain.Page;
 
 import com.github.fge.jsonpatch.JsonPatch;

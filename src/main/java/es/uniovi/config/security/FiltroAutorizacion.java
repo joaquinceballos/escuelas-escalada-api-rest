@@ -40,7 +40,7 @@ public class FiltroAutorizacion extends BasicAuthenticationFilter {
 		@Override
 		public void handle(HttpServletRequest request, HttpServletResponse response,
 				AccessDeniedException accessDeniedException) throws IOException, ServletException {
-			Map<String, String> map = Collections.singletonMap("error:", accessDeniedException.getLocalizedMessage());
+			Map<String, String> map = Collections.singletonMap("error", accessDeniedException.getLocalizedMessage());
 			ApiUtils.errorResponse(response, map, HttpStatus.FORBIDDEN);
 		}
 		

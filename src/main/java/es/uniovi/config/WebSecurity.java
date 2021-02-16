@@ -28,6 +28,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import es.uniovi.api.ApiUtils;
 import es.uniovi.common.Constantes;
@@ -63,7 +65,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.csrf().disable()
 			.authorizeRequests()
 			.antMatchers(HttpMethod.POST, "/login").permitAll()
-			.antMatchers(HttpMethod.POST, "/usuarios").hasRole(Constantes.ROLE_ADMIN)
+			.antMatchers(HttpMethod.POST, "/usuarios").permitAll()
 			.antMatchers(HttpMethod.GET, "/usuarios").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.PUT, "/usuarios/*/ascensiones/*").hasAnyRole(Constantes.ROLE_USER, Constantes.ROLE_ADMIN)
@@ -79,7 +81,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 				                   AccessDeniedException accessDeniedException) throws IOException, ServletException {
 					Map<String, String> map = new HashMap<>(4);
 					map.put("path", request.getRequestURI());
-					map.put("error:", accessDeniedException.getLocalizedMessage());
+					map.put("error", accessDeniedException.getLocalizedMessage());
 					ApiUtils.errorResponse(response, map, HttpStatus.FORBIDDEN);
 				}
 
@@ -92,7 +94,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 				public void commence(HttpServletRequest request,
 				                     HttpServletResponse response,
 				                     AuthenticationException authException) throws IOException, ServletException {
-					Map<String, String> map = Collections.singletonMap("error:", authException.getLocalizedMessage());
+					Map<String, String> map = Collections.singletonMap("error", authException.getLocalizedMessage());
 					ApiUtils.errorResponse(response, map, HttpStatus.UNAUTHORIZED);
 				}
 
@@ -102,4 +104,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.addFilter(new FiltroAutorizacion(authenticationManager(), secret));
 	}
 	
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*");
+            }
+        };
+    }
 }
