@@ -2,7 +2,6 @@ package es.uniovi.repository;
 
 import java.util.Set;
 
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
