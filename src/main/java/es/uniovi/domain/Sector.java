@@ -1,7 +1,10 @@
 package es.uniovi.domain;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -14,13 +17,18 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.uniovi.validation.Coordenadas;
 
 @Entity
 @Coordenadas
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_SECTOR_NOMBRE_ESCUELA", columnNames = { "NOMBRE", "ESCUELA" }))
-public class Sector implements Ubicable {
+public class Sector implements Ubicable, Serializable {
+
+	private static final long serialVersionUID = 6121972409424227333L;
 
 	@Id
 	@GeneratedValue
@@ -33,13 +41,26 @@ public class Sector implements Ubicable {
 
 	private Double longitud;
 
+	@JsonIgnore
 	@ManyToOne(optional = false)
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_SECTOR_ESCUELA"))
 	private Escuela escuela;
 
-	@OrderBy("nombre")
-	@OneToMany(mappedBy = "sector", orphanRemoval = true, fetch = FetchType.EAGER)
-	private Set<Via> vias;
+	@NotNull
+	@OrderBy("id")
+	@OneToMany(mappedBy = "sector",
+	           orphanRemoval = true,
+	           fetch = FetchType.EAGER,
+	           cascade = { CascadeType.REMOVE })
+	private Set<@NotNull Via> vias = new HashSet<>();
+
+	@NotNull
+	@OrderBy("id")
+	@OneToMany(mappedBy = "sector",
+	           orphanRemoval = true,
+	           fetch = FetchType.EAGER,
+	           cascade = { CascadeType.REMOVE })
+	private Set<@NotNull Croquis> croquis = new HashSet<>();	
 
 	public Sector() {
 		super();
@@ -93,6 +114,14 @@ public class Sector implements Ubicable {
 		this.vias = vias;
 	}
 
+	public Set<Croquis> getCroquis() {
+		return croquis;
+	}
+
+	public void setCroquis(Set<Croquis> croquis) {
+		this.croquis = croquis;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -111,8 +140,7 @@ public class Sector implements Ubicable {
 			return false;
 		Sector other = (Sector) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
+			return false;	
 		} else if (!id.equals(other.id))
 			return false;
 		return true;

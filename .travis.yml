@@ -1,0 +1,9 @@
+language: java
+after_success:
+  - mvn clean test jacoco:report coveralls:report
+addons:
+  sonarcloud:
+    organization: "joaquinceballos"
+    token: ${SONAR_TOKEN}
+script:
+  - mvn clean verify sonar:sonar -X -Pcoverage -Dsonar.projectKey=joaquinceballos

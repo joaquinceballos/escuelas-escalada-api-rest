@@ -22,10 +22,14 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +46,10 @@ import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.service.EscuelaService;
 
+@DataJpaTest
+@ActiveProfiles("test")
 @ExtendWith({ MockitoExtension.class })
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQLDB)
 class TestEscuelaController {
 
 	@Mock
@@ -88,7 +95,7 @@ class TestEscuelaController {
 		Page<Escuela> pageEscuela = new PageImpl<Escuela>(content, PageRequest.of(0, 50), 1);
 		Mockito.when(escuelaService.getEscuelas(0, 50)).thenReturn(pageEscuela);
 		
-		mockMvc.perform(get("/escuela"))
+		mockMvc.perform(get("/escuelas"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data", notNullValue()))
@@ -136,7 +143,7 @@ class TestEscuelaController {
 	 */
 	//@Test TODO no funciona @Validated desde Test
 	void testGetEscuelasFail1() throws Exception {
-		mockMvc.perform(get("/escuela")
+		mockMvc.perform(get("/escuelas")
 					.param("size", "0"))
 				.andExpect(status().is4xxClientError())
 				.andExpect(jsonPath("$.status", is("FAIL")));
@@ -149,7 +156,7 @@ class TestEscuelaController {
 	 */
 	@Test
 	void testGetEscuelasFail2() throws Exception {
-		mockMvc.perform(get("/escuela")
+		mockMvc.perform(get("/escuelas")
 					.param("size", "uno"))
 				.andExpect(status().is4xxClientError())
 				.andExpect(jsonPath("$.status", is("FAIL")))
@@ -168,7 +175,7 @@ class TestEscuelaController {
 		escuela.getSectores().add(sector);
 		sector.getVias().add(newVia(sector, "6a+", 3L, 20.0, "nombre vía", 10));
 		Mockito.when(escuelaService.getEscuela(ArgumentMatchers.any())).thenReturn(escuela);
-		mockMvc.perform(get("/escuela/1"))
+		mockMvc.perform(get("/escuelas/1"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data", notNullValue()))
@@ -197,7 +204,7 @@ class TestEscuelaController {
 	 */
 	@Test
 	void testGetEscuelaFail1() throws Exception {
-		mockMvc.perform(get("/escuela/uno"))
+		mockMvc.perform(get("/escuelas/uno"))
 				.andExpect(status().is4xxClientError())
 				.andExpect(jsonPath("$.status", is("FAIL")))
 				.andExpect(jsonPath("$.data", notNullValue()));
@@ -211,7 +218,7 @@ class TestEscuelaController {
 	@Test
 	void testGetEscuelaFail2() throws Exception {
 		Mockito.when(escuelaService.getEscuela(1l)).thenThrow(NoEncontradoException.class);
-		mockMvc.perform(get("/escuela/1"))
+		mockMvc.perform(get("/escuelas/1"))
 				.andExpect(status().is4xxClientError())
 				.andExpect(jsonPath("$.status", is("FAIL")))
 				.andExpect(jsonPath("$.data", notNullValue()));
@@ -229,7 +236,7 @@ class TestEscuelaController {
 		escuela.setNombre("nombre escuela");
 		escuela.setSectores(new HashSet<>());
 		Mockito.when(escuelaService.addEscuela(ArgumentMatchers.any())).thenReturn(escuela);
-		mockMvc.perform(post("/escuela")
+		mockMvc.perform(post("/escuelas")
 					.content(asJsonString(newEscuelaDto(null, "nombre escuela", null)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON))
@@ -245,7 +252,7 @@ class TestEscuelaController {
 	@Test
 	void testAddEscuelaFail1() throws Exception {
 		Mockito.when(escuelaService.addEscuela(ArgumentMatchers.any())).thenThrow(RestriccionDatosException.class);
-		mockMvc.perform(post("/escuela")
+		mockMvc.perform(post("/escuelas")
 					.content(asJsonString(newEscuelaDto(null, "nombre escuela", null)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON))
@@ -265,7 +272,7 @@ class TestEscuelaController {
 		sectores.add(newSector(null, 1l, null, null, "sector1"));
 		sectores.add(newSector(null, 2l, null, null, "sector2"));
 		Mockito.when(escuelaService.getSectores(1l)).thenReturn(sectores);
-		mockMvc.perform(get("/escuela/1/sector"))
+		mockMvc.perform(get("/escuelas/1/sectores"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data").isArray())
@@ -285,7 +292,7 @@ class TestEscuelaController {
 	void testGetSector() throws Exception {
 		Sector sector = newSector(null, 1l, null, null, "sector1");		
 		Mockito.when(escuelaService.getSector(1l, 2l)).thenReturn(sector);
-		mockMvc.perform(get("/escuela/1/sector/2"))
+		mockMvc.perform(get("/escuelas/1/sectores/2"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data.id", is(1)))
@@ -301,7 +308,7 @@ class TestEscuelaController {
 	void testAddSector() throws Exception {
 		Sector sector = newSector(null, 1l, 0.1, 1.0, "sector 7G");
 		Mockito.when(escuelaService.addSector(ArgumentMatchers.anyLong(), ArgumentMatchers.any())).thenReturn(sector);
-		mockMvc.perform(post("/escuela/1/sector")
+		mockMvc.perform(post("/escuelas/1/sectores")
 				.content(asJsonString(newSectorDto(null, null, null, "sector 7G", null)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON))
@@ -324,7 +331,7 @@ class TestEscuelaController {
 		vias.add(newVia(null, "5a", 1l, 5.0, "vía1", 10));
 		vias.add(newVia(null, "5a", 2l, 10.0, "vía2", 5));
 		Mockito.when(escuelaService.getVias(1l, 2l)).thenReturn(vias);
-		mockMvc.perform(get("/escuela/1/sector/2/via"))
+		mockMvc.perform(get("/escuelas/1/sectores/2/vias"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data").isArray())
@@ -347,7 +354,7 @@ class TestEscuelaController {
 	@Test
 	void testGetVia() throws Exception {
 		Mockito.when(escuelaService.getVia(1l, 2l, 3l)).thenReturn(newVia(null, "5a", 1l, 10.0, "vía1", 5));
-		mockMvc.perform(get("/escuela/1/sector/2/via/3"))
+		mockMvc.perform(get("/escuelas/1/sectores/2/vias/3"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status", is("SUCCESS")))
 				.andExpect(jsonPath("$.data.id", is(1)))
@@ -362,7 +369,7 @@ class TestEscuelaController {
 		Mockito
 		.when(escuelaService.addVia(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(),	ArgumentMatchers.any()))
 		.thenReturn(newVia(null, "5a", 1l, null, "vía1", 7));
-		mockMvc.perform(post("/escuela/1/sector/2/via")
+		mockMvc.perform(post("/escuelas/1/sectores/2/vias")
 					.content(asJsonString(newViaDto("5a", null, null, "vía1", null)))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON))

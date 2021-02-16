@@ -6,12 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQLDB)
 class TestDomain {
 
 	@BeforeEach
@@ -75,7 +81,6 @@ class TestDomain {
 		assertEquals(1.0, via.getLongitud());
 		assertEquals("nombre", via.getNombre());
 		assertEquals(1, via.getNumeroChapas());
-		assertEquals(new Sector(), via.getSector());
 		assertNotNull(via.toString());
 		assertNotNull(via.hashCode());
 		assertNotEquals(new Via(), via);

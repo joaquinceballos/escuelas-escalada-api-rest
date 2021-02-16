@@ -1,5 +1,6 @@
 package es.uniovi.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -25,7 +26,7 @@ public class SectorDto implements Ubicable {
 	private Double longitud;
 
 	@JsonInclude(Include.NON_NULL)
-	private List<ViaDto> vias;
+	private List<ViaDto> vias = new ArrayList<>();
 
 	public Long getId() {
 		return id;

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
+import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -64,5 +65,58 @@ public class UsuarioController extends BaseController {
 		usuarioService.deleteUsuario(id);
 		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
 	}
+	
+	/**
+	 * Retorna una lista paginada de ascensiones
+	 * 
+	 * @param page La página
+	 * @param size El tamaño de la página
+	 * @return Response con la lista paginada de ascensiones
+	 * @throws NoEncontradoException 
+	 */
+	@GetMapping("/{id}/ascensiones")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ListaPaginada<AscensionDto>> getAscensiones(
+			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(0) Integer page,
+			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size,
+			@PathVariable(name = "id") Long id) throws NoEncontradoException {
+		ListaPaginada<AscensionDto> pageAscension = pageAscensionToDto(usuarioService.getAscensiones(id, page, size));
+		return new ApiResponse<>(pageAscension, ApiResponseStatus.SUCCESS);
+	}
 
+	/**
+	 * Registra una nueva ascensión
+	 * 
+	 * @param ascensionDto La ascensión
+	 * @param idUsuario    La id del usuario
+	 * @param idVia        La id de la vía
+	 * @return La ascensión persistida
+	 * @throws NoEncontradoException
+	 */
+	@PostMapping("/{idUsuario}/ascensiones/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<AscensionDto> addAscension(
+			@RequestBody @Valid AscensionDto ascensionDto,
+			@PathVariable(name = "idUsuario") Long idUsuario,
+			@PathVariable(name = "idVia") Long idVia) throws NoEncontradoException {
+		return new ApiResponse<>(toDto(usuarioService.addAscension(idUsuario, idVia, toEntity(ascensionDto))), ApiResponseStatus.SUCCESS);
+	}
+
+	/**
+	 * Actualiza los campos de una ascesión existente
+	 * 
+	 * @param ascensionDto La ascensión
+	 * @param idUsuario    La id del usuario
+	 * @param idVia        La id de la vía
+	 * @return La ascensión actualizada
+	 * @throws NoEncontradoException
+	 */
+	@PutMapping("/{idUsuario}/ascensiones/{idVia}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<AscensionDto> updateAscension(
+			@RequestBody @Valid AscensionDto ascensionDto,
+			@PathVariable(name = "idUsuario") Long idUsuario,
+			@PathVariable(name = "idVia") Long idVia) throws NoEncontradoException {
+		return new ApiResponse<>(toDto(usuarioService.updateAscension(idUsuario, idVia, toEntity(ascensionDto))), ApiResponseStatus.SUCCESS);
+	}
 }
