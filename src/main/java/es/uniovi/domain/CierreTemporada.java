@@ -5,8 +5,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +17,7 @@ import es.uniovi.validation.ValueOfEnum;
 
 @Entity
 @PeriodoFechas
-public class CierreTemporada implements Serializable, Periodo {
+public class CierreTemporada implements Serializable, PeriodoDias {
 
 	private static final long serialVersionUID = -1119871856531367284L;
 

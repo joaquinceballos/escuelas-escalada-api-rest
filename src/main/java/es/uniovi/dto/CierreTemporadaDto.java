@@ -5,12 +5,12 @@ import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
 
 import es.uniovi.domain.MotivoCierre;
-import es.uniovi.domain.Periodo;
+import es.uniovi.domain.PeriodoDias;
 import es.uniovi.validation.PeriodoFechas;
 import es.uniovi.validation.ValueOfEnum;
 
 @PeriodoFechas
-public class CierreTemporadaDto implements Periodo {
+public class CierreTemporadaDto implements PeriodoDias {
 
 	private Long id;
 

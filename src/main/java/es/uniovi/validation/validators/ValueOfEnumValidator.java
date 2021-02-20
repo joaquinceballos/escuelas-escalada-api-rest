@@ -1,4 +1,4 @@
-package es.uniovi.validation;
+package es.uniovi.validation.validators;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import es.uniovi.validation.ValueOfEnum;
 
 public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, CharSequence> {
 	private List<String> acceptedValues;

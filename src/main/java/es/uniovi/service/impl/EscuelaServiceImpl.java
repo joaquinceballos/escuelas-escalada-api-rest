@@ -30,6 +30,7 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
+import es.uniovi.domain.HorasDeSol;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
@@ -40,6 +41,7 @@ import es.uniovi.exception.ServiceException;
 import es.uniovi.repository.CierreTemporadaRepository;
 import es.uniovi.repository.CroquisRepository;
 import es.uniovi.repository.EscuelaRepository;
+import es.uniovi.repository.HorasDeSolRepository;
 import es.uniovi.repository.SectorRepository;
 import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
@@ -69,8 +71,12 @@ public class EscuelaServiceImpl implements EscuelaService {
 	
 	@Autowired
 	private TrazoViaRepository trazoViaRepository;
-	
-	@Autowired ImagenService imagenService;
+
+	@Autowired
+	private HorasDeSolRepository horasDeSolRepository;
+
+	@Autowired
+	private ImagenService imagenService;
 	
 	@Override
 	public Page<Escuela> getEscuelas(Integer page, Integer size) {
@@ -175,8 +181,12 @@ public class EscuelaServiceImpl implements EscuelaService {
 	private void doSaveSector(Sector sector) {
 		sectorRepository.save(sector);
 		sector.getVias().forEach(v -> viaRepository.save(v));
+		if (sector.getHorasDeSol() != null) {
+			sector.getHorasDeSol().setSector(sector);
+			horasDeSolRepository.save(sector.getHorasDeSol());
+		}
 	}
-
+	
 	private Set<Via> clonaVias(Sector sector) {
 		return sector
 				.getVias()
@@ -406,7 +416,26 @@ public class EscuelaServiceImpl implements EscuelaService {
 		sector.setLatitud(sector2.getLatitud());
 		sector.setLongitud(sector2.getLongitud());
 		sector.setNombre(sector2.getNombre());
+		actualizaHorasDeSol(sector2, sector);
 		return sectorRepository.save(sector);
+	}
+
+	private void actualizaHorasDeSol(Sector sector2, Sector sector) {
+		if (sector.getHorasDeSol() != null) {
+			if (sector2.getHorasDeSol() == null) {
+				horasDeSolRepository.delete(sector.getHorasDeSol());
+			} else {
+				sector.getHorasDeSol().setInicio(sector2.getHorasDeSol().getInicio());
+				sector.getHorasDeSol().setFin(sector2.getHorasDeSol().getFin());
+				horasDeSolRepository.save(sector.getHorasDeSol());
+			}
+		} else if (sector2.getHorasDeSol() != null) {
+			HorasDeSol horasDeSol = sector2.getHorasDeSol();
+			horasDeSol.setSector(sector);
+			if (horasDeSol != null) {
+				horasDeSolRepository.save(horasDeSol);
+			}
+		}
 	}
 
 	@Override

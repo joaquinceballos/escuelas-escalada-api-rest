@@ -3,6 +3,7 @@ package es.uniovi.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,8 +26,13 @@ public class SectorDto implements Ubicable {
 	@JsonInclude(Include.NON_NULL)
 	private Double longitud;
 
+	@Valid
 	@JsonInclude(Include.NON_NULL)
 	private List<ViaDto> vias = new ArrayList<>();
+
+	@Valid
+	@JsonInclude(Include.NON_NULL)
+	private HorasDeSolDto horasDeSol;
 
 	public Long getId() {
 		return id;
@@ -66,6 +72,14 @@ public class SectorDto implements Ubicable {
 
 	public void setVias(List<ViaDto> vias) {
 		this.vias = vias;
+	}
+
+	public HorasDeSolDto getHorasDeSol() {
+		return horasDeSol;
+	}
+
+	public void setHorasDeSol(HorasDeSolDto horasDeSol) {
+		this.horasDeSol = horasDeSol;
 	}
 
 	@Override

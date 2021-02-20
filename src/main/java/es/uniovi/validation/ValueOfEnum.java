@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+import es.uniovi.validation.validators.ValueOfEnumValidator;
+
 @Documented
 @Target(FIELD)
 @Retention(RetentionPolicy.RUNTIME)

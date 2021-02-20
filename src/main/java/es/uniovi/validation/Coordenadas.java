@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+import es.uniovi.validation.validators.CoordenadasValidator;
+
 @Documented
 @Target(TYPE)
 @Retention(RetentionPolicy.RUNTIME)

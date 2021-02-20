@@ -1,10 +1,12 @@
-package es.uniovi.validation;
+package es.uniovi.validation.validators;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import es.uniovi.validation.PaisIso;
 
 public class PaisIsoValidator implements ConstraintValidator<PaisIso, String> {
 

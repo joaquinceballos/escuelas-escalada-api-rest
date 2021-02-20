@@ -1,11 +1,11 @@
 package es.uniovi.domain;
 
-import java.time.LocalDate;
+import java.time.temporal.Temporal;
 
-public interface Periodo {
+public interface Periodo<T extends Temporal> {
 
-	LocalDate getInicio();
+	T getInicio();
 
-	LocalDate getFin();
+	T getFin();
 	
 }
