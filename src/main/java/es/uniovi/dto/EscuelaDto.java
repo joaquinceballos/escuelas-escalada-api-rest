@@ -3,6 +3,7 @@ package es.uniovi.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -21,18 +22,26 @@ public class EscuelaDto implements Ubicable {
 	@NotBlank
 	private String nombre;
 
+	@Valid
 	@JsonInclude(Include.NON_NULL)
 	private List<SectorDto> sectores = new ArrayList<>();
 
+	@JsonInclude(Include.NON_NULL)
 	private Double latitud;
 
+	@JsonInclude(Include.NON_NULL)
 	private Double longitud;
 	
 	@PaisIso
+	@JsonInclude(Include.NON_NULL)
 	private String paisIso;
 	
 	@Size(max = 5000)
+	@JsonInclude(Include.NON_NULL)
 	private String informacion;
+	
+	@Valid
+	private List<CierreTemporadaDto> cierresTemporada = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -90,6 +99,14 @@ public class EscuelaDto implements Ubicable {
 
 	public void setInformacion(String informacion) {
 		this.informacion = informacion;
+	}
+
+	public List<CierreTemporadaDto> getCierresTemporada() {
+		return cierresTemporada;
+	}
+
+	public void setCierresTemporada(List<CierreTemporadaDto> cierresTemporada) {
+		this.cierresTemporada = cierresTemporada;
 	}
 
 	@Override

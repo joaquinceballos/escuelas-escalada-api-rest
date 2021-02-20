@@ -36,6 +36,9 @@ public class Escuela implements Ubicable, Serializable {
 	
 	@Column(length = 5000)
 	private String informacion;
+	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "escuela", orphanRemoval = true, cascade = CascadeType.ALL)
+	private Set<CierreTemporada> cierresTemporada;
 
 	@Id
 	@GeneratedValue
@@ -113,6 +116,14 @@ public class Escuela implements Ubicable, Serializable {
 
 	public void setInformacion(String informacion) {
 		this.informacion = informacion;
+	}
+
+	public Set<CierreTemporada> getCierresTemporada() {
+		return cierresTemporada;
+	}
+
+	public void setCierresTemporada(Set<CierreTemporada> cierresTemporada) {
+		this.cierresTemporada = cierresTemporada;
 	}
 
 	@Override

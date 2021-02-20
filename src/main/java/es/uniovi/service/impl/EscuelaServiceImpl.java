@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 
+import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
@@ -36,6 +37,7 @@ import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.repository.CierreTemporadaRepository;
 import es.uniovi.repository.CroquisRepository;
 import es.uniovi.repository.EscuelaRepository;
 import es.uniovi.repository.SectorRepository;
@@ -63,6 +65,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 	private CroquisRepository croquisRepository;
 
 	@Autowired
+	private CierreTemporadaRepository cierreTemporadaReporitory;
+	
+	@Autowired
 	private TrazoViaRepository trazoViaRepository;
 	
 	@Autowired ImagenService imagenService;
@@ -84,6 +89,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 			escuela.setId(null);
 			for (Sector sector : escuela.getSectores()) {
 				asociaNuevoSector(escuela, sector);
+			}
+			for (CierreTemporada cierreTemporada : escuela.getCierresTemporada()) {
+				asociaNuevoCierre(escuela, cierreTemporada);
 			}
 			return doSaveEscuela(escuela);
 		} catch (DataIntegrityViolationException e) {
@@ -514,6 +522,47 @@ public class EscuelaServiceImpl implements EscuelaService {
 				.findByCroquisAndVia(croquis, via)
 				.orElseThrow(() -> new NoEncontradoException("croquis, via", idCroquis + ", " + idVia));
 		trazoViaRepository.delete(trazoVia);	
+	}
+
+	@Override
+	public CierreTemporada addCierreTemporada(Long idEscuela, CierreTemporada cierreTemporada) throws ServiceException {
+		asociaNuevoCierre(doGetEscuela(idEscuela), cierreTemporada);
+		return cierreTemporadaReporitory.save(cierreTemporada);
+	}
+	
+	/**
+	 * <li>Asocia la escuela pasada al cierre pasado
+	 * <li>Setea a null la id del cierre
+	 * 
+	 * @param escuela         La escuela
+	 * @param cierreTemporada El cierre
+	 */
+	private void asociaNuevoCierre(Escuela escuela, CierreTemporada cierreTemporada) {
+		cierreTemporada.setEscuela(escuela);
+		cierreTemporada.setId(null);
+	}
+
+	@Override
+	public void deleteCierre(Long idEscuela, Long idCierre) throws ServiceException {
+		Escuela escuela = doGetEscuela(idEscuela);
+		CierreTemporada cierreTemporada = doGetCierreDeEscuela(idCierre, escuela);
+		escuela.getCierresTemporada().remove(cierreTemporada);
+		escuelaRepository.save(escuela);
+		cierreTemporadaReporitory.delete(cierreTemporada);		
+	}
+
+	private CierreTemporada doGetCierreDeEscuela(Long idCierre, Escuela escuela) throws NoEncontradoException {
+		if (escuela.getCierresTemporada() == null
+				|| escuela
+					.getCierresTemporada()
+					.stream()
+					.map(CierreTemporada::getId)
+					.filter(Objects::nonNull)
+					.filter(id -> id.equals(idCierre))
+					.count() == 0) {
+			throw new NoEncontradoException("escuela/cierre", escuela.getId() + "/" + idCierre);
+		}
+		return cierreTemporadaReporitory.findById(idCierre).orElseThrow(INCONSISTENCIA_EXCEPTION_SUPPLIER);
 	}
 	
 }
