@@ -38,7 +38,7 @@ public class Escuela implements Ubicable, Serializable {
 	private String informacion;
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "escuela", orphanRemoval = true, cascade = CascadeType.ALL)
-	private Set<CierreTemporada> cierresTemporada;
+	private Set<CierreTemporada> cierresTemporada = new HashSet<>();
 
 	@Id
 	@GeneratedValue
