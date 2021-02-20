@@ -10,14 +10,14 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import es.uniovi.validation.validators.CoordenadasValidator;
+import es.uniovi.validation.validators.PeriodoFechasValidator;
 
 @Documented
 @Target(TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = CoordenadasValidator.class)
-public @interface Coordenadas {
-	String message() default "Coordenadas pasadas no son correctas";
+@Constraint(validatedBy = PeriodoFechasValidator.class)
+public @interface PeriodoFechas {
+	String message() default "Periodo de fechas no válido";
 
 	Class<?>[] groups() default {};
 

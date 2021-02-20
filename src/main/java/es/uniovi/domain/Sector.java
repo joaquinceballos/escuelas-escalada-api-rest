@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -20,6 +21,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import es.uniovi.validation.Coordenadas;
 
@@ -60,7 +63,11 @@ public class Sector implements Ubicable, Serializable {
 	           orphanRemoval = true,
 	           fetch = FetchType.EAGER,
 	           cascade = { CascadeType.REMOVE })
-	private Set<@NotNull Croquis> croquis = new HashSet<>();	
+	private Set<@NotNull Croquis> croquis = new HashSet<>();
+	
+	@JsonInclude(content = Include.NON_NULL)
+	@OneToOne(mappedBy = "sector", optional = true, cascade = CascadeType.REMOVE)
+	private HorasDeSol horasDeSol;
 
 	public Sector() {
 		super();
@@ -120,6 +127,14 @@ public class Sector implements Ubicable, Serializable {
 
 	public void setCroquis(Set<Croquis> croquis) {
 		this.croquis = croquis;
+	}
+
+	public HorasDeSol getHorasDeSol() {
+		return horasDeSol;
+	}
+
+	public void setHorasDeSol(HorasDeSol horasDeSol) {
+		this.horasDeSol = horasDeSol;
 	}
 
 	@Override

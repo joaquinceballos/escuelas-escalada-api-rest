@@ -35,6 +35,7 @@ import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
@@ -42,6 +43,7 @@ import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.dto.AscensionDto;
+import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
@@ -291,6 +293,14 @@ public abstract class BaseController {
 	
 	protected TrazoViaDto toDto(TrazoVia trazoVia) {
 		return modelMapper.map(trazoVia, TrazoViaDto.class);
+	}
+
+	protected CierreTemporada toEntity(CierreTemporadaDto cierreTemporadaDto) {
+		return modelMapper.map(cierreTemporadaDto, CierreTemporada.class);
+	}
+	
+	protected CierreTemporadaDto toDto(CierreTemporada cierreTemporada) {
+		return modelMapper.map(cierreTemporada, CierreTemporadaDto.class);
 	}
 
 }

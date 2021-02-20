@@ -17,11 +17,28 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import es.uniovi.validation.Coordenadas;
+import es.uniovi.validation.PaisIso;
+
 @Entity
+@Coordenadas
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
-public class Escuela implements Serializable {
+public class Escuela implements Ubicable, Serializable {
 
 	private static final long serialVersionUID = 8023830574582405343L;
+	
+	private Double latitud;
+	
+	private Double longitud;
+	
+	@PaisIso
+	private String paisIso;
+	
+	@Column(length = 5000)
+	private String informacion;
+	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "escuela", orphanRemoval = true, cascade = CascadeType.ALL)
+	private Set<CierreTemporada> cierresTemporada = new HashSet<>();
 
 	@Id
 	@GeneratedValue
@@ -66,6 +83,48 @@ public class Escuela implements Serializable {
 	public void setSectores(Set<Sector> sectores) {
 		this.sectores = sectores;
 	}	
+
+	@Override
+	public Double getLatitud() {
+		return this.latitud;
+	}
+
+	public void setLatitud(Double latitud) {
+		this.latitud = latitud;
+	}
+
+	@Override
+	public Double getLongitud() {
+		return this.longitud;
+	}
+
+	public void setLongitud(Double longitud) {
+		this.longitud = longitud;
+	}
+
+	public String getPaisIso() {
+		return paisIso;
+	}
+
+	public void setPaisIso(String paisIso) {
+		this.paisIso = paisIso;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
+	}
+
+	public Set<CierreTemporada> getCierresTemporada() {
+		return cierresTemporada;
+	}
+
+	public void setCierresTemporada(Set<CierreTemporada> cierresTemporada) {
+		this.cierresTemporada = cierresTemporada;
+	}
 
 	@Override
 	public int hashCode() {

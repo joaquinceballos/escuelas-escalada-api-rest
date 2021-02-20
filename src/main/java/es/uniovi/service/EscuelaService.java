@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 
 import com.github.fge.jsonpatch.JsonPatch;
 
+import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
@@ -266,5 +267,23 @@ public interface EscuelaService {
 			Long idSector,
 			Long idCroquis,
 			Long idVia) throws NoEncontradoException;
+
+	/**
+	 * Persiste nuevo cierre de temporada para la escuela pasada
+	 * 
+	 * @param idEscuela       La id de la escuela
+	 * @param cierreTemporada El nuevo cierre de temporada
+	 * @return El cierre de temporada persistido
+	 * @throws ServiceException
+	 */
+	CierreTemporada addCierreTemporada(Long idEscuela, CierreTemporada cierreTemporada) throws ServiceException;
+
+	/**
+	 * Borra el cierre de temporada cuya id es pasada
+	 * 
+	 * @param idEscuela El id de la escuela
+	 * @param idCierre  El id del cierre
+	 */
+	void deleteCierre(Long idEscuela, Long idCierre) throws ServiceException;
 
 }
