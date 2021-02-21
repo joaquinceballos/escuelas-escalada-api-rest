@@ -2,6 +2,8 @@ name: test & build & deploy
 on:
   push:
     branches: [ develop, feature-ci ]
+  pull_request:
+    branches: [ develop, main ]  
 jobs:
   build:
     name: build
