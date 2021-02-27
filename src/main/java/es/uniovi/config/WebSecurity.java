@@ -55,6 +55,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
 	}
 
+	private static final String[] AUTH_WHITELIST = { 
+			"/v2/api-docs",
+			"/v3/api-docs",
+			"/swagger-resources/**",
+			"/swagger-ui/**"
+		};
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.sessionManagement()
@@ -66,6 +73,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 			.antMatchers(HttpMethod.POST, "/login").permitAll()
 			.antMatchers(HttpMethod.POST, "/usuarios").permitAll()
+			.antMatchers(AUTH_WHITELIST).permitAll()
 			.antMatchers(HttpMethod.GET, "/usuarios").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.PUT, "/usuarios/*/ascensiones/*").hasAnyRole(Constantes.ROLE_USER, Constantes.ROLE_ADMIN)
