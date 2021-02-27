@@ -18,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Escuela;
+import es.uniovi.domain.Sector;
+import es.uniovi.domain.Via;
 import es.uniovi.service.BuscadorService;
 
 @Service
@@ -27,43 +29,56 @@ public class BuscadorServiceImpl implements BuscadorService {
 	private EntityManagerFactory entityManagerFactory;
 
 	@Override
-	public Page<Escuela> getEscuelas(String nombre, Integer page, Integer size) {
+	public Page<Escuela> buscaEscuelas(String texto, Integer page, Integer size) {
+		return paginaResultados(texto, page, size, Escuela.class, "nombre", "informacion");
+	}
 
-		Page<Escuela> escuelas = null;
+	@Override
+	public Page<Sector> buscaSectores(String texto, Integer page, Integer size) {
+		return paginaResultados(texto, page, size, Sector.class, "nombre");
+	}
+
+	@Override
+	public Page<Via> buscaVias(String texto, Integer page, Integer size) {
+		return paginaResultados(texto, page, size, Via.class, "nombre");
+	}
+	
+	private <T> Page<T> paginaResultados(
+			String texto,
+			Integer page,
+			Integer size,
+			Class<T> className,
+			String... campos) {
+		Page<T> pagina = null;
 
 		EntityManager em = entityManagerFactory.createEntityManager();
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
 		em.getTransaction().begin();
 
 		try {
-			Query query = createLuceneQuery(nombre, fullTextEntityManager);
-			FullTextQuery persistenceQuery = fullTextEntityManager.createFullTextQuery(query, Escuela.class);
-			persistenceQuery.setFirstResult(page *  size);
+			QueryBuilder queryBuilder = fullTextEntityManager
+					.getSearchFactory()
+					.buildQueryBuilder()
+					.forEntity(className)
+					.get();
+			Query query = queryBuilder
+					.keyword()
+					.onFields(campos)
+					.matching(texto)
+					.createQuery();
+			FullTextQuery persistenceQuery = fullTextEntityManager.createFullTextQuery(query, className);
+			persistenceQuery.setFirstResult(page * size);
 			persistenceQuery.setMaxResults(size);
 			@SuppressWarnings("unchecked")
-			List<Escuela> result = persistenceQuery.getResultList();
+			List<T> result = persistenceQuery.getResultList();
 			int total = persistenceQuery.getResultSize();
-			escuelas = new PageImpl<>(result, PageRequest.of(page, size), total);
+			pagina = new PageImpl<>(result, PageRequest.of(page, size), total);
 		} catch (SearchException e) {
-			escuelas = Page.empty();
+			pagina = Page.empty();
 		}
+
 		em.getTransaction().commit();
 		em.close();
-		return escuelas;
+		return pagina;
 	}
-
-	private Query createLuceneQuery(String nombre, FullTextEntityManager fullTextEntityManager) {
-		QueryBuilder qb = fullTextEntityManager
-				.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity(Escuela.class)
-				.get();
-				
-		return qb
-				.keyword()
-				.onFields("nombre")
-				.matching(nombre)
-				.createQuery();
-	}
-
 }
