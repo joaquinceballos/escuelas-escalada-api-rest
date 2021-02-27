@@ -15,9 +15,16 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import es.uniovi.search.analyzer.NombreViaAnalyzer;
+
 @Entity
+@Indexed(index = "Via")
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_VIA_NOMBRE_SECTOR", columnNames = { "NOMBRE", "SECTOR" }))
 public class Via implements Serializable {
 
@@ -28,6 +35,7 @@ public class Via implements Serializable {
 	private Long id;
 
 	@NotBlank
+	@Field(analyzer = @Analyzer(impl = NombreViaAnalyzer.class))
 	private String nombre;
 
 	@NotBlank
