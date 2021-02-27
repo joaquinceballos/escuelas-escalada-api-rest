@@ -16,3 +16,8 @@ target/
 /mvnw*
 .dbeaver/
 Scripts/
+
+### lucene ###
+Escuela/
+Sector/
+Via/
