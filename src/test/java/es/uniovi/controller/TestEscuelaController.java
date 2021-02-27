@@ -261,6 +261,19 @@ class TestEscuelaController {
 		.andExpect(jsonPath("$.data", notNullValue()));
 	}
 	
+	@Test
+	void testAddEscuelaFail2() throws Exception {		
+		EscuelaDto escuelaDto = newEscuelaDto(null, "nombre escuela", null);
+		escuelaDto.setPaisIso("es"); // país válido -> ES
+		mockMvc.perform(post("/escuelas")
+					.content(asJsonString(escuelaDto))
+					.contentType(MediaType.APPLICATION_JSON)
+					.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().is4xxClientError())
+		.andExpect(jsonPath("$.status", is("FAIL")))
+		.andExpect(jsonPath("$.data", notNullValue()));
+	}
+	
 	/**
 	 * Llamada correcta para obtener los sectores de una escuela
 	 * 
@@ -406,6 +419,7 @@ class TestEscuelaController {
 		escuelaDto.setId(id);
 		escuelaDto.setNombre("nombre escuela");
 		escuelaDto.setSectores(sectores);
+		escuelaDto.setPaisIso("ES");
 		return escuelaDto;
 	}
 

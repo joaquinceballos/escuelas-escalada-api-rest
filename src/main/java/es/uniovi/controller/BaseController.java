@@ -1,6 +1,7 @@
 package es.uniovi.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -35,6 +37,7 @@ import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.common.Constantes;
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
@@ -42,12 +45,15 @@ import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.dto.AscensionDto;
+import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.SectorRootDto;
 import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
+import es.uniovi.dto.ViaRootDto;
 import es.uniovi.exception.ImagenNoValidaException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
@@ -74,6 +80,14 @@ public abstract class BaseController {
 	protected ApiResponse<Void> handleException(Exception e) throws Exception {
 		logger.error(e);
 		return new ApiResponse<>("Error general del servidor", Constantes.ERROR_INTERNO);
+	}
+	
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	protected ApiResponse<Map<String, String>> handleException(MissingServletRequestParameterException e) {
+		Map<String, String> errors = new HashMap<>();
+		errors.put("error", "Parámetro obligatorio no informado: " + e.getParameterName());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
 
 	@ExceptionHandler(RestriccionDatosException.class)
@@ -193,7 +207,7 @@ public abstract class BaseController {
 		return modelMapper.map(sectorDto, Sector.class);
 	}
 	
-	protected List<SectorDto> toSectoresDto(Set<Sector> sectores) {
+	protected List<SectorDto> toSectoresDto(Collection<Sector> sectores) {
 		return sectores.stream().map(this::toDto).collect(Collectors.toList());
 	}
 
@@ -293,4 +307,38 @@ public abstract class BaseController {
 		return modelMapper.map(trazoVia, TrazoViaDto.class);
 	}
 
+	protected CierreTemporada toEntity(CierreTemporadaDto cierreTemporadaDto) {
+		return modelMapper.map(cierreTemporadaDto, CierreTemporada.class);
+	}
+	
+	protected CierreTemporadaDto toDto(CierreTemporada cierreTemporada) {
+		return modelMapper.map(cierreTemporada, CierreTemporadaDto.class);
+	}
+
+	protected ListaPaginada<ViaRootDto> pageBuscaViaToDto(Page<Via> paginaVias) {
+		ListaPaginada<ViaRootDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaVias.getSize());
+		listaPaginada.setPage(paginaVias.getNumber());
+		List<ViaRootDto> contenido = new ArrayList<>();
+		for (Via via : paginaVias.getContent()) {
+			contenido.add(modelMapper.map(via, ViaRootDto.class));
+		}
+		listaPaginada.setContenido(contenido);
+		listaPaginada.setTotalPaginas(paginaVias.getTotalPages());
+		return listaPaginada;
+	}
+
+	protected ListaPaginada<SectorRootDto> pageSectorToDto(Page<Sector> paginaSectores) {
+		ListaPaginada<SectorRootDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaSectores.getSize());
+		listaPaginada.setPage(paginaSectores.getNumber());
+		List<SectorRootDto> contenido = new ArrayList<>();
+		for (Sector sector : paginaSectores.getContent()) {
+			contenido.add(modelMapper.map(sector, SectorRootDto.class));
+		}
+		listaPaginada.setContenido(contenido);
+		listaPaginada.setTotalPaginas(paginaSectores.getTotalPages());
+		return listaPaginada;
+	}
+	
 }

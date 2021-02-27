@@ -30,6 +30,7 @@ import es.uniovi.api.ListaPaginada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
+import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
@@ -396,4 +397,39 @@ public class EscuelaController extends BaseController {
 		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
 	}
 
+	/**
+	 * Añade nuevo cierre de temporada a la escuela pasada en el path
+	 * 
+	 * @param id  El id de la escuela
+	 * @param dto El nuevo cierre de temporada
+	 * @return Response con el cierre persistido
+	 * @throws ServiceException
+	 */
+	@PostMapping("/{id}/cierres")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public ApiResponse<CierreTemporadaDto> addCierreTemporada(
+			@PathVariable("id") Long id,
+			@Valid @RequestBody CierreTemporadaDto dto) throws ServiceException {
+		return new ApiResponse<>(
+				toDto(escuelaService.addCierreTemporada(id, toEntity(dto))),
+				ApiResponseStatus.SUCCESS);
+	}
+	
+	/**
+	 * Elimina el cierre de temporada cuya id es pasado en el path
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del cierre de temporada
+	 * @return Response con el resultado de la operación
+	 * @throws ServiceException
+	 */	
+	@DeleteMapping("/{idEscuela}/cierres/{idCierre}")
+	@ResponseStatus(code= HttpStatus.OK)	
+	public ApiResponse<Void> deleteCierreTemporada(
+			@PathVariable("idEscuela") @NotNull Long idEscuela,
+			@PathVariable("idCierre") @NotNull Long idCierre) throws ServiceException {
+		escuelaService.deleteCierre(idEscuela, idCierre);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
+	}
+	
 }
