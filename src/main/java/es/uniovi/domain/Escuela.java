@@ -17,11 +17,18 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
+import es.uniovi.search.analyzer.ApiAnalyzer;
+import es.uniovi.search.analyzer.NombreEscuelaAnalyzer;
 import es.uniovi.validation.Coordenadas;
 import es.uniovi.validation.PaisIso;
 
 @Entity
 @Coordenadas
+@Indexed(index = "Escuela")
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
 public class Escuela implements Ubicable, Serializable {
 
@@ -35,6 +42,7 @@ public class Escuela implements Ubicable, Serializable {
 	private String paisIso;
 	
 	@Column(length = 5000)
+	@Field(analyzer = @Analyzer(impl = ApiAnalyzer.class))
 	private String informacion;
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "escuela", orphanRemoval = true, cascade = CascadeType.ALL)
@@ -46,6 +54,7 @@ public class Escuela implements Ubicable, Serializable {
 
 	@NotBlank
 	@Column(nullable = false)
+	@Field(analyzer = @Analyzer(impl = NombreEscuelaAnalyzer.class))
 	private String nombre;
 
 	@NotNull
