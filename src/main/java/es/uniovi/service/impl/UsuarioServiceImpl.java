@@ -8,6 +8,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import es.uniovi.domain.Ascension;
 import es.uniovi.domain.Rol;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
@@ -117,6 +120,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	private Via doGetVia(Long idVia) throws NoEncontradoException {
 		return viaRepository.findById(idVia).orElseThrow(() -> new NoEncontradoException("via.id", idVia));
+	}
+
+	@Override
+	public Usuario getUsuario(String username) throws NoAutorizadoException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
+		if (username == null || !username.equals(currentPrincipalName)) {
+			throw new NoAutorizadoException();
+		}
+		return usuarioRepository.findByUsername(username).orElse(null);
 	}
 
 }

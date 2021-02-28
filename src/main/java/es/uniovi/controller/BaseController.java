@@ -54,6 +54,7 @@ import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.dto.ViaRootDto;
 import es.uniovi.exception.ImagenNoValidaException;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -180,6 +181,13 @@ public abstract class BaseController {
 		Map<String, Object> errors = Collections.singletonMap("error", e.getMessage());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
 	}
+	
+	@ResponseStatus(code = HttpStatus.FORBIDDEN)
+	@ExceptionHandler(NoAutorizadoException.class)
+	protected ApiResponse<Map<String, Object>> handleException(NoAutorizadoException e) {
+		Map<String, Object> errors = Collections.singletonMap("error", "No autorizado");
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
+	}	
 
 	///////////////////////////////
 	////// mapeo DTO-Entity ///////
