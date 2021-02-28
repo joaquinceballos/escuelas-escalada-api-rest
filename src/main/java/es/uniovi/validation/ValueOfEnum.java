@@ -1,6 +1,6 @@
 package es.uniovi.validation;
 
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -10,14 +10,16 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import es.uniovi.validation.validators.CoordenadasValidator;
+import es.uniovi.validation.validators.ValueOfEnumValidator;
 
 @Documented
-@Target(TYPE)
+@Target(FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = CoordenadasValidator.class)
-public @interface Coordenadas {
-	String message() default "Coordenadas pasadas no son correctas";
+@Constraint(validatedBy = ValueOfEnumValidator.class)
+public @interface ValueOfEnum {
+	Class<? extends Enum<?>> enumClass();
+
+	String message() default "debe ser una enumeración de {enumClass}";
 
 	Class<?>[] groups() default {};
 

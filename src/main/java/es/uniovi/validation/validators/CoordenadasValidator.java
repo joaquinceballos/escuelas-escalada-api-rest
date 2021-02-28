@@ -1,9 +1,10 @@
-package es.uniovi.validation;
+package es.uniovi.validation.validators;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import es.uniovi.domain.Ubicable;
+import es.uniovi.validation.Coordenadas;
 
 public class CoordenadasValidator implements ConstraintValidator<Coordenadas, Ubicable> {
 
