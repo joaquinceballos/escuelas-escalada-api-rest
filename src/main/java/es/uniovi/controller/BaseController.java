@@ -23,7 +23,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -61,7 +60,6 @@ import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.service.ImagenService;
 
 @Controller
-@CrossOrigin(origins = "*") // TODO acotar los origins
 public abstract class BaseController {
 	
     private static final Logger logger = LogManager.getLogger(BaseController.class);

@@ -8,11 +8,14 @@ insert
 	usuario (email,
 	nombre,
 	password,
-	id)
+	id,
+	username,
+	apellido1,
+	pais)
 values ('admin@email.es',
-'admin',
+'Carla',
 '$2a$10$HUXRJe8aGk2xXXZm6eP/MuFhLsR7KvyAen4fnB3kOGLifBwqIvI4O',
--1);
+-1, 'admin', 'admin', 'ES');
 
 --usuario user
 insert
@@ -20,11 +23,16 @@ insert
 	usuario (email,
 	nombre,
 	password,
-	id)
+	id,
+	username,
+	apellido1,
+	apellido2,
+	pais,
+	nacimiento)
 values ('user@email.es',
-'user',
+'Juan',
 '$2a$10$HUXRJe8aGk2xXXZm6eP/MuFhLsR7KvyAen4fnB3kOGLifBwqIvI4O',
--2);
+-2, 'user', 'apellido1', 'apellido2', 'ES', STR_TO_DATE('1980-07-31', '%Y-%m-%d') );
 
 -- rol ADMIN
 insert
