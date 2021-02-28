@@ -1,6 +1,7 @@
 package es.uniovi.domain;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -15,9 +16,14 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Past;
+
+import es.uniovi.validation.PaisIso;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "uq_usuario_nombre"))
+@Table(uniqueConstraints = {
+		@UniqueConstraint(columnNames = "email", name = "uq_usuario_email"),
+		@UniqueConstraint(columnNames = "username", name = "uq_usuario_username") })
 public class Usuario implements Serializable {
 
 	private static final long serialVersionUID = 5481015999454416823L;
@@ -31,6 +37,18 @@ public class Usuario implements Serializable {
 	private String password;
 	
 	private String email;
+	
+	private String username;
+	
+	private String apellido1;
+	
+	private String apellido2;
+	
+	@Past
+	private LocalDate nacimiento;
+	
+	@PaisIso
+	private String pais;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_rol",
@@ -96,6 +114,46 @@ public class Usuario implements Serializable {
 
 	public void setAscenciones(List<Ascension> ascenciones) {
 		this.ascenciones = ascenciones;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getApellido1() {
+		return apellido1;
+	}
+
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1;
+	}
+
+	public String getApellido2() {
+		return apellido2;
+	}
+
+	public void setApellido2(String apellido2) {
+		this.apellido2 = apellido2;
+	}
+
+	public LocalDate getNacimiento() {
+		return nacimiento;
+	}
+
+	public void setNacimiento(LocalDate nacimiento) {
+		this.nacimiento = nacimiento;
+	}
+
+	public String getPais() {
+		return pais;
+	}
+
+	public void setPais(String pais) {
+		this.pais = pais;
 	}
 
 	@Override
