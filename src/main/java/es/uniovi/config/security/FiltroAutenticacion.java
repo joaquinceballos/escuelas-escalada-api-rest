@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.common.Constantes;
-import es.uniovi.dto.UsuarioDto;
+import es.uniovi.dto.LoginDto;
 
 public class FiltroAutenticacion extends UsernamePasswordAuthenticationFilter {
 	
@@ -50,12 +50,12 @@ public class FiltroAutenticacion extends UsernamePasswordAuthenticationFilter {
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			UsuarioDto credenciales = new ObjectMapper().readValue(request.getInputStream(), UsuarioDto.class);
-			if (credenciales.getEmail() == null || credenciales.getPassword() == null) {
-				throw new BadCredentialsException("email o contraseña no válidos: " + credenciales);
+			LoginDto credenciales = new ObjectMapper().readValue(request.getInputStream(), LoginDto.class);
+			if (credenciales.getUsername() == null || credenciales.getPassword() == null) {
+				throw new BadCredentialsException("usuario o contraseña no válidos: " + credenciales);
 			} else {
 				Authentication authenticacion = new UsernamePasswordAuthenticationToken(
-						credenciales.getEmail(),
+						credenciales.getUsername(),
 						credenciales.getPassword());
 				return getAuthenticationManager().authenticate(authenticacion);
 			}

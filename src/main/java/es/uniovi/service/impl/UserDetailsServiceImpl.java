@@ -3,6 +3,7 @@ package es.uniovi.service.impl;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +23,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) {
-		Usuario usuario = usuarioRepository.findByEmail(username).orElseThrow(noExiste(username));
-		return User.withUsername(usuario.getEmail())
+		Usuario usuario;
+		if (EmailValidator.getInstance().isValid(username)) {
+			usuario = usuarioRepository.findByEmail(username).orElseThrow(noExiste(username));
+		} else {
+			usuario = usuarioRepository.findByUsername(username).orElseThrow(noExiste(username));
+		}
+		return User
+				.withUsername(usuario.getUsername())
 				.roles(usuario
 					.getRoles()
 					.stream()
@@ -34,8 +41,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				.build();
 	}
 
-	private Supplier<? extends UsernameNotFoundException> noExiste(String email) {
-		return () -> new UsernameNotFoundException("No se encontró usuario por email: " + email);
+	private Supplier<? extends UsernameNotFoundException> noExiste(String username) {
+		return () -> new UsernameNotFoundException("No se encontró usuario: " + username);
 	}
 	
 }

@@ -44,7 +44,6 @@ class TestDomain {
 		assertFalse(escuela1.equals(null));
 		assertFalse(escuela1.equals(""));
 		assertTrue(escuela1.equals(escuela1));
-		assertNotNull(escuela1.hashCode());
 	}
 
 	@Test
@@ -64,7 +63,6 @@ class TestDomain {
 		assertEquals(new HashSet<>(), sector.getVias());
 		assertNotEquals(new Sector(), sector);
 		assertNotNull(sector.toString());
-		assertNotNull(sector.hashCode());
 	}
 
 	@Test
@@ -82,7 +80,6 @@ class TestDomain {
 		assertEquals("nombre", via.getNombre());
 		assertEquals(1, via.getNumeroChapas());
 		assertNotNull(via.toString());
-		assertNotNull(via.hashCode());
 		assertNotEquals(new Via(), via);
 	}
 

@@ -26,4 +26,12 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 	 */
 	Optional<Usuario> findByEmail(String email);
 
+	/**
+	 * Obtiene el usuario cuyo username es pasado
+	 * 
+	 * @param username El nombre de usuario
+	 * @return El usuario recuperado
+	 */
+	Optional<Usuario> findByUsername(String username);
+
 }

@@ -1,10 +1,17 @@
 package es.uniovi.dto;
 
+import java.time.LocalDate;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+import es.uniovi.validation.PaisIso;
 
 public class UsuarioDto {
 
@@ -20,7 +27,22 @@ public class UsuarioDto {
 	@NotBlank
 	@JsonInclude(Include.NON_NULL)
 	private String password;
+	
+	@NotBlank
+	@Size(min = 4, max = 20)
+	@Pattern(regexp = "[a-zA-Z0-9]+")
+	private String username;
 
+	@NotBlank
+	private String apellido1;
+
+	private String apellido2;
+	
+	@Past
+	private LocalDate nacimiento;
+	
+	@PaisIso
+	private String pais;
 	public UsuarioDto() {
 		super();
 	}
@@ -46,7 +68,7 @@ public class UsuarioDto {
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		this.email = email.trim();
 	}
 
 	public String getPassword() {
@@ -55,6 +77,48 @@ public class UsuarioDto {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username.trim();
+	}
+
+	public String getApellido1() {
+		return apellido1;
+	}
+
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1.trim();
+	}
+
+	public String getApellido2() {
+		return apellido2;
+	}
+
+	public void setApellido2(String apellido2) {
+		if (apellido2 != null) {
+			this.apellido2 = apellido2.trim();
+		}
+	}
+
+	public LocalDate getNacimiento() {
+		return nacimiento;
+	}
+
+	public void setNacimiento(LocalDate nacimiento) {
+		this.nacimiento = nacimiento;
+	}
+
+	public String getPais() {
+		return pais;
+	}
+
+	public void setPais(String pais) {
+		this.pais = pais;
 	}
 
 	@Override
