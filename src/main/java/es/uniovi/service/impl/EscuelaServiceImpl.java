@@ -417,6 +417,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		sector.setLongitud(sector2.getLongitud());
 		sector.setNombre(sector2.getNombre());
 		actualizaHorasDeSol(sector2, sector);
+		sector.setInformacion(sector2.getInformacion());
 		return sectorRepository.save(sector);
 	}
 
