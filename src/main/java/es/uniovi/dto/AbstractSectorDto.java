@@ -2,6 +2,7 @@ package es.uniovi.dto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -26,6 +27,10 @@ public abstract class AbstractSectorDto implements Ubicable {
 	@Valid
 	@JsonInclude(Include.NON_NULL)
 	private HorasDeSolDto horasDeSol;
+	
+	@Size(max = 5000)
+	@JsonInclude(Include.NON_NULL)
+	private String informacion;
 
 	public Long getId() {
 		return id;
@@ -65,6 +70,14 @@ public abstract class AbstractSectorDto implements Ubicable {
 
 	public void setHorasDeSol(HorasDeSolDto horasDeSol) {
 		this.horasDeSol = horasDeSol;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
 	}
 
 	@Override
