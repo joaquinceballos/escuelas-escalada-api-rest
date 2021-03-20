@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -76,6 +77,9 @@ public class Sector implements Ubicable, Serializable {
 	@OneToOne(mappedBy = "sector", optional = true, cascade = CascadeType.REMOVE)
 	private HorasDeSol horasDeSol;
 
+	@Column(length = 5000)
+	private String informacion;
+
 	public Sector() {
 		super();
 	}
@@ -142,6 +146,14 @@ public class Sector implements Ubicable, Serializable {
 
 	public void setHorasDeSol(HorasDeSol horasDeSol) {
 		this.horasDeSol = horasDeSol;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
 	}
 
 	@Override
