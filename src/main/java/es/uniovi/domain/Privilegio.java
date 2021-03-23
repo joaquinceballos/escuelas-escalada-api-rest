@@ -4,12 +4,17 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "UQ_PRIVILEGIO_NOMBRE", columnNames = "NOMBRE"))
 public class Privilegio implements Serializable {
 
 	private static final long serialVersionUID = 568876450650919715L;
@@ -18,7 +23,8 @@ public class Privilegio implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	private String nombre;
+	@Enumerated(EnumType.STRING)
+	private NombrePrivilegio nombre;
 
 	@ManyToMany(mappedBy = "privilegios")
 	private List<Rol> roles;
@@ -31,7 +37,7 @@ public class Privilegio implements Serializable {
 		return id;
 	}
 
-	public String getNombre() {
+	public NombrePrivilegio getNombre() {
 		return nombre;
 	}
 
@@ -43,7 +49,7 @@ public class Privilegio implements Serializable {
 		this.id = id;
 	}
 
-	public void setNombre(String nombre) {
+	public void setNombre(NombrePrivilegio nombre) {
 		this.nombre = nombre;
 	}
 

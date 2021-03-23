@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,9 +13,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "UQ_ROL_NOMBRE", columnNames = "NOMBRE"))
 public class Rol implements Serializable {
 
 	private static final long serialVersionUID = -8591357215885726940L;
@@ -22,7 +26,8 @@ public class Rol implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	private String nombre;
+	@Enumerated(EnumType.STRING)
+	private NombreRol nombre;
 
 	@ManyToMany(mappedBy = "roles")
 	private List<Usuario> usuarios;
@@ -47,7 +52,7 @@ public class Rol implements Serializable {
 		return id;
 	}
 
-	public String getNombre() {
+	public NombreRol getNombre() {
 		return nombre;
 	}
 
@@ -63,7 +68,7 @@ public class Rol implements Serializable {
 		this.id = id;
 	}
 
-	public void setNombre(String nombre) {
+	public void setNombre(NombreRol nombre) {
 		this.nombre = nombre;
 	}
 
