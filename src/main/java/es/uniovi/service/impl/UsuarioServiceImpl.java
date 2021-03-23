@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.NombreRol;
 import es.uniovi.domain.Rol;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
@@ -54,7 +55,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Usuario addUsuario(Usuario usuario) throws RestriccionDatosException {
 		try {
 			codificaPassword(usuario);
-			Rol rolUser = rolRepository.findByNombre("USER").orElseThrow(()-> new NoSuchElementException("rol USER"));
+			Rol rolUser = rolRepository
+					.findByNombre(NombreRol.valueOf("USER"))
+					.orElseThrow(() -> new NoSuchElementException("rol USER"));
 			usuario.setRoles(Arrays.asList(rolUser));
 			return usuarioRepository.save(usuario);
 		} catch (DataIntegrityViolationException e) {
