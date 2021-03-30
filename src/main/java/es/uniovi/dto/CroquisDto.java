@@ -11,7 +11,7 @@ public class CroquisDto {
 
 	private Long id;
 
-	private SectorDto sector;
+	private SectorRootDto sector;
 
 	private List<TrazoViaDto> trazos;
 
@@ -35,11 +35,11 @@ public class CroquisDto {
 		this.id = id;
 	}
 
-	public SectorDto getSector() {
+	public SectorRootDto getSector() {
 		return sector;
 	}
 
-	public void setSector(SectorDto sector) {
+	public void setSector(SectorRootDto sector) {
 		this.sector = sector;
 	}
 
