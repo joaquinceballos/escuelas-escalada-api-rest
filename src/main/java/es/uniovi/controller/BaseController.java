@@ -292,7 +292,7 @@ public abstract class BaseController {
 		List<CroquisDto> croquisList = new ArrayList<>();
 		for (Croquis c : croquis) {
 			CroquisDto dto = toDto(c);
-			dto.setImagen(null); // las listas de DTO de croquis no tendrán imágen
+			//dto.setImagen(null); //TODO las listas de DTO de croquis no tendrán imágen
 			croquisList.add(dto);
 		}
 		return croquisList;
