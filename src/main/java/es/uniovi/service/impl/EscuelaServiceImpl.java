@@ -45,6 +45,7 @@ import es.uniovi.repository.HorasDeSolRepository;
 import es.uniovi.repository.SectorRepository;
 import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
+import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.EscuelaService;
 import es.uniovi.service.ImagenService;
 
