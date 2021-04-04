@@ -45,6 +45,7 @@ import es.uniovi.repository.HorasDeSolRepository;
 import es.uniovi.repository.SectorRepository;
 import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
+import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.EscuelaService;
 import es.uniovi.service.ImagenService;
 
@@ -77,7 +78,10 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Autowired
 	private ImagenService imagenService;
-	
+
+	@Autowired
+	private ZonaRepository zonaRepository;
+
 	@Override
 	public Page<Escuela> getEscuelas(Integer page, Integer size) {
 		return escuelaRepository.findAll(PageRequest.of(page, size, Sort.by("nombre")));
@@ -99,6 +103,10 @@ public class EscuelaServiceImpl implements EscuelaService {
 			for (CierreTemporada cierreTemporada : escuela.getCierresTemporada()) {
 				asociaNuevoCierre(escuela, cierreTemporada);
 			}
+			if (escuela.getZona() != null
+					&& Boolean.FALSE.equals(zonaRepository.existsById(escuela.getZona().getId()))) {
+				throw new RestriccionDatosException("Zona no existe: " + escuela.getZona().getId());
+			}
 			return doSaveEscuela(escuela);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -113,7 +121,6 @@ public class EscuelaServiceImpl implements EscuelaService {
 	 */
 	private Escuela doSaveEscuela(Escuela escuela) {
 		Escuela saved = escuelaRepository.save(escuela);
-		//escuela.getSectores().forEach(this::doSaveSector);
 		return saved;
 	}
 
