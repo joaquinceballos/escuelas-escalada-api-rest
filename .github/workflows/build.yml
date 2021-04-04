@@ -58,7 +58,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        repository: ${{ github.repository }}/api-image
+        repository: ${{ github.repository }}/api-escuelas
         tags: latest,${{ steps.tag_version.outputs.new_tag }}
   docker-run:
     runs-on: ubuntu-latest
@@ -72,13 +72,13 @@ jobs:
           echo docker login
           sudo docker login https://docker.pkg.github.com -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
           echo docker pull
-          sudo docker pull docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-image:latest
+          sudo docker pull docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-escuelas:latest
           echo docker stop container
           sudo docker container stop contenedor-api-escuelas-dev
           echo docker remove container
           sudo docker container rm contenedor-api-escuelas-dev
           echo docker run
-          sudo docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev -e SPRING_DATASOURCE_URL=${{secrets.DEV_DATABASE_URL}} -e SPRING_DATASOURCE_USERNAME=${{secrets.DEV_DATABASE_USERNAME}} -e SPRING_DATASOURCE_PASSWORD=${{secrets.DEV_DATABASE_PASSWORD}} -e SERVER_PORT=8080 -e SPRING_SECURITY_JWT_SECRET=${{secrets.JWT_SECRET}} --name contenedor-api-escuelas-dev -d docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-image &
+          sudo docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev -e SPRING_DATASOURCE_URL=${{secrets.DEV_DATABASE_URL}} -e SPRING_DATASOURCE_USERNAME=${{secrets.DEV_DATABASE_USERNAME}} -e SPRING_DATASOURCE_PASSWORD=${{secrets.DEV_DATABASE_PASSWORD}} -e SERVER_PORT=8080 -e SPRING_SECURITY_JWT_SECRET=${{secrets.JWT_SECRET}} --name contenedor-api-escuelas-dev -d docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-escuelas &
           echo fin
         host: ${{ secrets.API_HOST }}
         user: ${{ secrets.SSH_USER }}
