@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import es.uniovi.domain.Ubicable;
 import es.uniovi.validation.Coordenadas;
-import es.uniovi.validation.PaisIso;
 
 @Coordenadas
 public abstract class AbstractEscuelaDto implements Ubicable {
@@ -28,16 +27,14 @@ public abstract class AbstractEscuelaDto implements Ubicable {
 	@JsonInclude(Include.NON_NULL)
 	private Double longitud;
 
-	@PaisIso
-	@JsonInclude(Include.NON_NULL)
-	private String paisIso;
-
 	@Size(max = 5000)
 	@JsonInclude(Include.NON_NULL)
 	private String informacion;
 
 	@Valid
 	private List<CierreTemporadaDto> cierresTemporada = new ArrayList<>();
+	
+	private ZonaDto zona;
 
 	public Long getId() {
 		return id;
@@ -73,14 +70,6 @@ public abstract class AbstractEscuelaDto implements Ubicable {
 		this.longitud = longitud;
 	}
 
-	public String getPaisIso() {
-		return paisIso;
-	}
-
-	public void setPaisIso(String paisIso) {
-		this.paisIso = paisIso;
-	}
-
 	public String getInformacion() {
 		return informacion;
 	}
@@ -95,6 +84,14 @@ public abstract class AbstractEscuelaDto implements Ubicable {
 
 	public void setCierresTemporada(List<CierreTemporadaDto> cierresTemporada) {
 		this.cierresTemporada = cierresTemporada;
+	}
+
+	public ZonaDto getZona() {
+		return zona;
+	}
+
+	public void setZona(ZonaDto zona) {
+		this.zona = zona;
 	}
 
 	@Override
