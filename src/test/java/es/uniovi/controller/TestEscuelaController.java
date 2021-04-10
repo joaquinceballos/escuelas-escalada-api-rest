@@ -93,7 +93,7 @@ class TestEscuelaController {
 		content.add(newEscuela(2l, "escuela 2"));
 				
 		Page<Escuela> pageEscuela = new PageImpl<Escuela>(content, PageRequest.of(0, 50), 1);
-		Mockito.when(escuelaService.getEscuelas(0, 50)).thenReturn(pageEscuela);
+		Mockito.when(escuelaService.getEscuelas(0, 50, null)).thenReturn(pageEscuela);
 		
 		mockMvc.perform(get("/escuelas"))
 				.andExpect(status().isOk())

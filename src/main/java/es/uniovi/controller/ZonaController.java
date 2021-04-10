@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,9 @@ import es.uniovi.api.ListaPaginada;
 import es.uniovi.dto.ZonaDto;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.ZonaService;
+import es.uniovi.validation.PaisIso;
 
+@Validated
 @RestController
 @RequestMapping("zonas")
 public class ZonaController extends BaseController {
@@ -35,9 +38,10 @@ public class ZonaController extends BaseController {
 	@GetMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<ZonaDto>> getZonas(
+			@RequestParam(name = "pais", required = false) @PaisIso String pais,
 			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(0) Integer page,
 			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) {
-		return new ApiResponse<>(pageZonasToDto(zonaService.getZonas(page, size)), ApiResponseStatus.SUCCESS);
+		return new ApiResponse<>(pageZonasToDto(zonaService.getZonas(page, size, pais)), ApiResponseStatus.SUCCESS);
 	}
 	
 	@GetMapping("/{id}")

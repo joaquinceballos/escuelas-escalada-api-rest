@@ -1,5 +1,7 @@
 package es.uniovi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -24,5 +26,14 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 	 */
 	@Query("select count (e.id) from zona z, escuela e where z.id = e.zona and z.id = :id")
 	Integer countEscuelasById(Long id);
+
+	/**
+	 * Recupera las zonas filtrando por país
+	 * 
+	 * @param pageable Parámetros de paginación
+	 * @param pais     El país
+	 * @return Las zonas
+	 */
+	Page<Zona> findAllByPais(Pageable pageable, String pais);
 
 }

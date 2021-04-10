@@ -64,13 +64,13 @@ class TestEscuelaService {
 	void testGetEscuelas() throws Exception {
 		// Con la base de datos vacía compruebo que el método retorna una página vacía y
 		// el total de escuelas es 0
-		Page<Escuela> page = escuelaService.getEscuelas(0, 50);
+		Page<Escuela> page = escuelaService.getEscuelas(0, 50, null);
 		assertEquals(0, page.getTotalElements());
 
 		// Añado una escuela y compruebo que se retorna correctamente en la Page
 		Escuela escuela1 = nuevaEscuela("Oviedo 1");
 		escuela1 = escuelaService.addEscuela(escuela1);
-		page = escuelaService.getEscuelas(0, 50);
+		page = escuelaService.getEscuelas(0, 50, null);
 		assertEquals(1, page.getTotalElements());
 		assertEquals(escuela1, page.get().findAny().orElse(null));
 
@@ -78,7 +78,7 @@ class TestEscuelaService {
 		// dos escuelas grabadas
 		Escuela escuela2 = nuevaEscuela("Oviedo 2");
 		escuela2 = escuelaService.addEscuela(escuela2);
-		page = escuelaService.getEscuelas(0, 50);
+		page = escuelaService.getEscuelas(0, 50, null);
 		assertEquals(2, page.getTotalElements());
 		Set<Escuela> set = page.get().collect(Collectors.toSet());
 		assertEquals(2, set.size());

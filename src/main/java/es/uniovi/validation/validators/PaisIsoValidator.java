@@ -15,7 +15,11 @@ public class PaisIsoValidator implements ConstraintValidator<PaisIso, String> {
 		if (value == null) {
 			return true;
 		}
-		return Arrays.asList(Locale.getISOCountries()).stream().anyMatch(p -> p.equals(value));
+		return Arrays
+				.asList(Locale.getISOCountries())
+				.stream()
+				.filter(c -> c.length() == 2) /* sólo se validarán los códigos de 2 caracteres */
+				.anyMatch(p -> p.equals(value));
 	}
 
 }
