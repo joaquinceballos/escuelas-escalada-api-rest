@@ -14,9 +14,10 @@ public interface ZonaService {
 	 * 
 	 * @param page El número de página
 	 * @param size El tamaño de la página
+	 * @param pais El país por el que se filtrarán los resultados
 	 * @return La página de resultados
 	 */
-	Page<Zona> getZonas(Integer page, Integer size);
+	Page<Zona> getZonas(Integer page, Integer size, String pais);
 
 	/**
 	 * Persiste una nueva Zona

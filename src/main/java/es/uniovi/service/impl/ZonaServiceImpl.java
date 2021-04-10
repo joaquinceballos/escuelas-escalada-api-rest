@@ -20,8 +20,13 @@ public class ZonaServiceImpl implements ZonaService {
 	private ZonaRepository zonaRepository;
 
 	@Override
-	public Page<Zona> getZonas(Integer page, Integer size) {
-		return zonaRepository.findAll(PageRequest.of(page, size, Sort.by("pais")));
+	public Page<Zona> getZonas(Integer page, Integer size, String pais) {
+		PageRequest pageable = PageRequest.of(page, size, Sort.by("numeroEscuelas").descending());
+		if (pais != null) {
+			return zonaRepository.findAllByPais(pageable, pais);
+		} else {
+			return zonaRepository.findAll(pageable);
+		}
 	}
 
 	@Override
@@ -58,7 +63,7 @@ public class ZonaServiceImpl implements ZonaService {
 		if (zonaRepository.countEscuelasById(zona.getId()) > 0) {
 			throw new RestriccionDatosException("No es posible borrar la zona");
 		}
-		zonaRepository.delete(zona);		
+		zonaRepository.delete(zona);
 	}
 
 }
