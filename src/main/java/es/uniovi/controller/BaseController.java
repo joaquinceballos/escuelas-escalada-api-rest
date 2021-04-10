@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -83,6 +84,30 @@ public abstract class BaseController {
 		return new ApiResponse<>("Error general del servidor", Constantes.ERROR_INTERNO);
 	}
 	
+	@ExceptionHandler(BindException.class)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	protected ApiResponse<Map<String, String>> handleException(BindException e) {
+		return getObjectErrors(e);
+	}
+
+	private ApiResponse<Map<String, String>> getObjectErrors(BindException e) {
+		Map<String, String> errors = new HashMap<>();
+		e.getBindingResult().getAllErrors().forEach(error -> {
+			if (error instanceof FieldError) {
+				String fieldName = ((FieldError) error).getField();
+				String errorMessage = error.getDefaultMessage();
+				errors.put(fieldName, errorMessage);
+			} else {
+				ObjectError objectError = error;
+				String objectName = objectError.getObjectName();
+				String errorMessage = objectError.getDefaultMessage();
+				errors.put(objectName, errorMessage);
+				logger.info(error.getClass());
+			}
+		});
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	protected ApiResponse<Map<String, String>> handleException(MissingServletRequestParameterException e) {
@@ -102,21 +127,7 @@ public abstract class BaseController {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ApiResponse<Map<String, String>> handleException(MethodArgumentNotValidException e) {
-		Map<String, String> errors = new HashMap<>();
-		e.getBindingResult().getAllErrors().forEach(error -> {
-			if (error instanceof FieldError) {
-				String fieldName = ((FieldError) error).getField();
-				String errorMessage = error.getDefaultMessage();
-				errors.put(fieldName, errorMessage);
-			} else if (error instanceof ObjectError) {
-				ObjectError objectError = (ObjectError) error;
-				String objectName = objectError.getObjectName();
-				String errorMessage = objectError.getDefaultMessage();
-				errors.put(objectName, errorMessage);
-				logger.info(error.getClass());
-			}
-		});
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+		return getObjectErrors(e);
 	}
 
 	@ResponseStatus(code = HttpStatus.NOT_FOUND)

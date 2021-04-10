@@ -32,6 +32,8 @@ public class Zona implements Serializable {
 
 	@NotEmpty
 	private String region;
+	
+	private String informacion;
 
 	@Formula("(select count(*)" +
 	         " from escuela e "+ 
@@ -89,6 +91,22 @@ public class Zona implements Serializable {
 
 	public void setRegion(String region) {
 		this.region = region;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
+	}
+
+	public Set<Escuela> getEscuelas() {
+		return escuelas;
+	}
+
+	public void setEscuelas(Set<Escuela> escuelas) {
+		this.escuelas = escuelas;
 	}
 
 	@Override

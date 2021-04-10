@@ -6,18 +6,19 @@ import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.filtro.FiltroZonas;
 
 public interface ZonaService {
 
 	/**
 	 * Obtine la página de zonas para los parámetros pasados
 	 * 
-	 * @param page El número de página
-	 * @param size El tamaño de la página
-	 * @param pais El país por el que se filtrarán los resultados
+	 * @param page        El número de página
+	 * @param size        El tamaño de la página
+	 * @param filtroZonas El filtro
 	 * @return La página de resultados
 	 */
-	Page<Zona> getZonas(Integer page, Integer size, String pais);
+	Page<Zona> getZonas(Integer page, Integer size, FiltroZonas filtroZonas);
 
 	/**
 	 * Persiste una nueva Zona
@@ -51,7 +52,7 @@ public interface ZonaService {
 	 * Borra la zona cuya id es pasada
 	 * 
 	 * @param id La id
-	 * @throws ServiceException 
+	 * @throws ServiceException
 	 */
 	void deleteZona(Long id) throws ServiceException;
 
