@@ -36,6 +36,7 @@ import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
 import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.ViaDto;
+import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
 
@@ -53,13 +54,15 @@ public class EscuelaController extends BaseController {
 	 * @param page La página
 	 * @param size El tamaño de la página
 	 * @return Response con la lista paginada de escuelas
+	 * @throws NoEncontradoException 
 	 */
 	@GetMapping
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
+			@RequestParam(name = "idZona", required = false)  Long idZona,
 			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(0) Integer page,
-			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) {
-		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size)), ApiResponseStatus.SUCCESS);
+			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) throws NoEncontradoException {
+		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size, idZona)), ApiResponseStatus.SUCCESS);
 	}
 
 	/**

@@ -35,6 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 					.getRoles()
 					.stream()
 					.map(Rol::getNombre)
+					.map(Object::toString)
 					.collect(Collectors.toList())
 					.toArray(new String[0]))
 				.password(usuario.getPassword())

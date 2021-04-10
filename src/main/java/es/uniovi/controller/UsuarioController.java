@@ -23,6 +23,7 @@ import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.UsuarioDto;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
@@ -118,5 +119,11 @@ public class UsuarioController extends BaseController {
 			@PathVariable(name = "idUsuario") Long idUsuario,
 			@PathVariable(name = "idVia") Long idVia) throws NoEncontradoException {
 		return new ApiResponse<>(toDto(usuarioService.updateAscension(idUsuario, idVia, toEntity(ascensionDto))), ApiResponseStatus.SUCCESS);
+	}
+
+	@GetMapping("/{username}")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<UsuarioDto> getUsuario(@PathVariable(name = "username") String username) throws NoAutorizadoException {
+		return new ApiResponse<>(toDto(usuarioService.getUsuario(username)), ApiResponseStatus.SUCCESS);
 	}
 }

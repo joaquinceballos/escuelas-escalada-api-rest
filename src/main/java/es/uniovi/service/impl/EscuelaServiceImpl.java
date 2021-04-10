@@ -34,6 +34,7 @@ import es.uniovi.domain.HorasDeSol;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
+import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -45,6 +46,7 @@ import es.uniovi.repository.HorasDeSolRepository;
 import es.uniovi.repository.SectorRepository;
 import es.uniovi.repository.TrazoViaRepository;
 import es.uniovi.repository.ViaRepository;
+import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.EscuelaService;
 import es.uniovi.service.ImagenService;
 
@@ -77,10 +79,22 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Autowired
 	private ImagenService imagenService;
-	
+
+	@Autowired
+	private ZonaRepository zonaRepository;
+
 	@Override
-	public Page<Escuela> getEscuelas(Integer page, Integer size) {
-		return escuelaRepository.findAll(PageRequest.of(page, size, Sort.by("nombre")));
+	public Page<Escuela> getEscuelas(Integer page, Integer size, Long idZona) throws NoEncontradoException {
+			PageRequest pageable = PageRequest.of(page, size, Sort.by("nombre"));
+		if (idZona != null) {
+			if (!zonaRepository.existsById(idZona)) {
+				throw new NoEncontradoException("zona.id", idZona);
+			}
+			Zona zona = zonaRepository.findById(idZona).orElse(null);			
+			return escuelaRepository.findAllByZona(pageable, zona);
+		} else {
+			return escuelaRepository.findAll(pageable);
+		}
 	}
 
 	@Override
@@ -99,6 +113,10 @@ public class EscuelaServiceImpl implements EscuelaService {
 			for (CierreTemporada cierreTemporada : escuela.getCierresTemporada()) {
 				asociaNuevoCierre(escuela, cierreTemporada);
 			}
+			if (escuela.getZona() != null
+					&& Boolean.FALSE.equals(zonaRepository.existsById(escuela.getZona().getId()))) {
+				throw new RestriccionDatosException("Zona no existe: " + escuela.getZona().getId());
+			}
 			return doSaveEscuela(escuela);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -113,7 +131,6 @@ public class EscuelaServiceImpl implements EscuelaService {
 	 */
 	private Escuela doSaveEscuela(Escuela escuela) {
 		Escuela saved = escuelaRepository.save(escuela);
-		//escuela.getSectores().forEach(this::doSaveSector);
 		return saved;
 	}
 
@@ -417,6 +434,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		sector.setLongitud(sector2.getLongitud());
 		sector.setNombre(sector2.getNombre());
 		actualizaHorasDeSol(sector2, sector);
+		sector.setInformacion(sector2.getInformacion());
 		return sectorRepository.save(sector);
 	}
 

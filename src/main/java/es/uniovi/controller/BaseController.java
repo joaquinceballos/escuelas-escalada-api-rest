@@ -43,6 +43,7 @@ import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
+import es.uniovi.domain.Zona;
 import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
@@ -53,7 +54,9 @@ import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.dto.ViaRootDto;
+import es.uniovi.dto.ZonaDto;
 import es.uniovi.exception.ImagenNoValidaException;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -180,6 +183,13 @@ public abstract class BaseController {
 		Map<String, Object> errors = Collections.singletonMap("error", e.getMessage());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
 	}
+	
+	@ResponseStatus(code = HttpStatus.FORBIDDEN)
+	@ExceptionHandler(NoAutorizadoException.class)
+	protected ApiResponse<Map<String, Object>> handleException(NoAutorizadoException e) {
+		Map<String, Object> errors = Collections.singletonMap("error", "No autorizado");
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
+	}	
 
 	///////////////////////////////
 	////// mapeo DTO-Entity ///////
@@ -284,7 +294,7 @@ public abstract class BaseController {
 		List<CroquisDto> croquisList = new ArrayList<>();
 		for (Croquis c : croquis) {
 			CroquisDto dto = toDto(c);
-			dto.setImagen(null); // las listas de DTO de croquis no tendrán imágen
+			//dto.setImagen(null); //TODO las listas de DTO de croquis no tendrán imágen
 			croquisList.add(dto);
 		}
 		return croquisList;
@@ -337,6 +347,27 @@ public abstract class BaseController {
 		listaPaginada.setContenido(contenido);
 		listaPaginada.setTotalPaginas(paginaSectores.getTotalPages());
 		return listaPaginada;
+	}
+	
+	protected ListaPaginada<ZonaDto> pageZonasToDto(Page<Zona> paginaZonas){
+		ListaPaginada<ZonaDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaZonas.getSize());
+		listaPaginada.setPage(paginaZonas.getNumber());
+		listaPaginada.setContenido(toZonasDto(paginaZonas.getContent()));
+		listaPaginada.setTotalPaginas(paginaZonas.getTotalPages());
+		return listaPaginada;
+	}
+	
+	protected ZonaDto toDto(Zona zona) {
+		return modelMapper.map(zona, ZonaDto.class);
+	}
+
+	private List<ZonaDto> toZonasDto(List<Zona> zonas) {
+		return zonas.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected Zona toEntity(ZonaDto zonaDto) {
+		return modelMapper.map(zonaDto, Zona.class);
 	}
 	
 }

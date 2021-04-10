@@ -12,11 +12,11 @@ import javax.validation.Payload;
 import es.uniovi.validation.validators.PaisIsoValidator;
 
 @Documented
-@Target(ElementType.FIELD)
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PaisIsoValidator.class)
 public @interface PaisIso {
-	String message() default "Código ISO país no válido";
+	String message() default "Código de país no es válido (ISO 3166)";
 
 	Class<?>[] groups() default {};
 

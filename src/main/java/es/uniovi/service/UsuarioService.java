@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 
 import es.uniovi.domain.Ascension;
 import es.uniovi.domain.Usuario;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
@@ -78,5 +79,13 @@ public interface UsuarioService {
 	 * @throws NoEncontradoException
 	 */
 	Ascension updateAscension(Long idUsuario, Long idVia, Ascension ascension) throws NoEncontradoException;
+
+	/**
+	 * Obtiene el usuario por el username
+	 * 
+	 * @param username El username
+	 * @return
+	 */
+	Usuario getUsuario(String username) throws NoAutorizadoException;
 
 }
