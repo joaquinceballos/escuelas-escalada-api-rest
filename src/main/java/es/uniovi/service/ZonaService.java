@@ -1,6 +1,7 @@
 package es.uniovi.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
@@ -13,12 +14,11 @@ public interface ZonaService {
 	/**
 	 * Obtine la página de zonas para los parámetros pasados
 	 * 
-	 * @param page        El número de página
-	 * @param size        El tamaño de la página
-	 * @param filtroZonas El filtro
+	 * @param pageable Los parámetros de paginación
+	 * @param filtro   El filtro
 	 * @return La página de resultados
 	 */
-	Page<Zona> getZonas(Integer page, Integer size, FiltroZonas filtroZonas);
+	Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro);
 
 	/**
 	 * Persiste una nueva Zona

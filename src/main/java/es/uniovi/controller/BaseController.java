@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
@@ -200,7 +201,18 @@ public abstract class BaseController {
 	protected ApiResponse<Map<String, Object>> handleException(NoAutorizadoException e) {
 		Map<String, Object> errors = Collections.singletonMap("error", "No autorizado");
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
-	}	
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(PropertyReferenceException.class)
+	protected ApiResponse<Map<String, Object>> handleException(PropertyReferenceException e) {
+		Map<String, Object> errors = Collections.singletonMap("error",
+				"Propiedad " +
+				e.getPropertyName() +
+				" no se encuentra en " +
+				e.getType());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
 
 	///////////////////////////////
 	////// mapeo DTO-Entity ///////

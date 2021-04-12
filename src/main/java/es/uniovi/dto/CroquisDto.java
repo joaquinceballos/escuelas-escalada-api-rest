@@ -15,6 +15,7 @@ public class CroquisDto {
 
 	private List<TrazoViaDto> trazos;
 
+	@NotBlank
 	@JsonInclude(Include.NON_NULL)
 	private String imagen;
 

@@ -1,9 +1,10 @@
 package es.uniovi.service.impl;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Zona;
@@ -21,9 +22,7 @@ public class ZonaServiceImpl implements ZonaService {
 	private ZonaRepository zonaRepository;
 
 	@Override
-	public Page<Zona> getZonas(Integer page, Integer size, FiltroZonas filtro) {
-		Sort sort = Sort.by(Sort.Order.desc("numeroEscuelas"), Sort.Order.asc("region"));
-		PageRequest pageable = PageRequest.of(page, size, sort);
+	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) {
 		if (filtro.getPais() != null) {
 			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
 				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThan(filtro.getPais(), 0, pageable);
