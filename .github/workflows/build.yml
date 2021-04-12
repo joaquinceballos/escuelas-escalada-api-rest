@@ -78,7 +78,7 @@ jobs:
           echo docker remove container
           sudo docker container rm contenedor-api-escuelas-dev
           echo docker run
-          sudo docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev -e SPRING_DATASOURCE_URL=${{secrets.DEV_DATABASE_URL}} -e SPRING_DATASOURCE_USERNAME=${{secrets.DEV_DATABASE_USERNAME}} -e SPRING_DATASOURCE_PASSWORD=${{secrets.DEV_DATABASE_PASSWORD}} -e SERVER_PORT=8080 -e SPRING_SECURITY_JWT_SECRET=${{secrets.JWT_SECRET}} --name contenedor-api-escuelas-dev -d docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-escuelas &
+          sudo docker run -p 8080:8080  -v /home/ubuntu/claves:/claves -e SPRING_PROFILES_ACTIVE=dev -e SPRING_DATASOURCE_URL=${{secrets.DEV_DATABASE_URL}} -e SPRING_DATASOURCE_USERNAME=${{secrets.DEV_DATABASE_USERNAME}} -e SPRING_DATASOURCE_PASSWORD=${{secrets.DEV_DATABASE_PASSWORD}} -e SERVER_SSL_ENABLED=true -e SERVER_SSL_KEYSTORE=claves/keystore.p12 -e SERVER_SSL_KEYSTOREPASSWORD= -e SERVER_SSL_KEYSTORETYPE=PKCS12 -e SERVER_SSL_KEYALIAS=tomcat  -e SERVER_PORT=8080 -e SPRING_SECURITY_JWT_SECRET=${{secrets.JWT_SECRET}} --name contenedor-api-escuelas-dev -d docker.pkg.github.com/joaquinceballos/escuelas-escalada-api-rest/api-escuelas &
           echo fin
         host: ${{ secrets.API_HOST }}
         user: ${{ secrets.SSH_USER }}

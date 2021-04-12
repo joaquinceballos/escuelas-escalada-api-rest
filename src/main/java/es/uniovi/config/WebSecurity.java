@@ -5,6 +5,7 @@ package es.uniovi.config;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -38,7 +39,10 @@ import es.uniovi.config.security.FiltroAutorizacion;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-		
+
+	@Value("${cors.allowed-origins}")
+	private List<String> allowedOrigins;
+
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
@@ -117,7 +121,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "DELETE", "PUT");
+				registry
+				.addMapping("/**")
+				.allowedOrigins(allowedOrigins.toArray(new String[0]))
+				.allowedMethods("GET", "POST", "DELETE", "PUT");
 			}
 		};
 	}

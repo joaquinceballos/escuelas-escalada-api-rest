@@ -13,6 +13,8 @@ public class ZonaDto {
 
 	@NotEmpty
 	private String region;
+	
+	private String informacion;
 
 	private Integer numeroEscuelas;
 
@@ -60,6 +62,14 @@ public class ZonaDto {
 
 	public void setNumeroVias(Integer numeroVias) {
 		this.numeroVias = numeroVias;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
 	}
 
 	@Override

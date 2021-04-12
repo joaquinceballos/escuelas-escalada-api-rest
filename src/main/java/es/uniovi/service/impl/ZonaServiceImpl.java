@@ -1,15 +1,17 @@
 package es.uniovi.service.impl;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.filtro.FiltroZonas;
 import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.ZonaService;
 
@@ -20,12 +22,19 @@ public class ZonaServiceImpl implements ZonaService {
 	private ZonaRepository zonaRepository;
 
 	@Override
-	public Page<Zona> getZonas(Integer page, Integer size, String pais) {
-		PageRequest pageable = PageRequest.of(page, size, Sort.by("numeroEscuelas").descending());
-		if (pais != null) {
-			return zonaRepository.findAllByPais(pageable, pais);
+	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) {
+		if (filtro.getPais() != null) {
+			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
+				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThan(filtro.getPais(), 0, pageable);
+			} else {
+				return zonaRepository.findAllByPais(filtro.getPais(), pageable);
+			}
 		} else {
-			return zonaRepository.findAll(pageable);
+			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
+				return zonaRepository.findByNumeroEscuelasGreaterThan(0, pageable);
+			} else {
+				return zonaRepository.findAll(pageable);
+			}
 		}
 	}
 
