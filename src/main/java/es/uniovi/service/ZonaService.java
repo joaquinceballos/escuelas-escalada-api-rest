@@ -1,23 +1,24 @@
 package es.uniovi.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.filtro.FiltroZonas;
 
 public interface ZonaService {
 
 	/**
 	 * Obtine la página de zonas para los parámetros pasados
 	 * 
-	 * @param page El número de página
-	 * @param size El tamaño de la página
-	 * @param pais El país por el que se filtrarán los resultados
+	 * @param pageable Los parámetros de paginación
+	 * @param filtro   El filtro
 	 * @return La página de resultados
 	 */
-	Page<Zona> getZonas(Integer page, Integer size, String pais);
+	Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro);
 
 	/**
 	 * Persiste una nueva Zona
@@ -51,7 +52,7 @@ public interface ZonaService {
 	 * Borra la zona cuya id es pasada
 	 * 
 	 * @param id La id
-	 * @throws ServiceException 
+	 * @throws ServiceException
 	 */
 	void deleteZona(Long id) throws ServiceException;
 

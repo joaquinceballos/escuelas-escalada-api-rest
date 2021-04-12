@@ -104,7 +104,7 @@ class TestEscuelaService {
 		assertNotNull(escuela.getId());
 		
 		// No me permite añadir una escuela cuyo nombre ya existe
-		assertThrows(DataIntegrityViolationException.class, () -> escuelaService.addEscuela(nuevaEscuela("Oviedo 1")));
+		assertThrows(RestriccionDatosException.class, () -> escuelaService.addEscuela(nuevaEscuela("Oviedo 1")));
 		
 		// No me permite añadir una escuela sin nombre
 		// TODO se debería validar antes de intentar grabar. Lo suyo es que se lance una excepción comprobada

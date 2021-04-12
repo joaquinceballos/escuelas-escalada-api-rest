@@ -103,8 +103,10 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	@Transactional
 	public Escuela addEscuela(Escuela escuela) throws RestriccionDatosException {
+		if(escuelaRepository.existsByNombre(escuela.getNombre())) {
+			throw new RestriccionDatosException("Escuela ya existe");
+		}
 		try {
 			escuela.setId(null);
 			for (Sector sector : escuela.getSectores()) {
@@ -130,8 +132,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	 * @return La escuela persistida
 	 */
 	private Escuela doSaveEscuela(Escuela escuela) {
-		Escuela saved = escuelaRepository.save(escuela);
-		return saved;
+		return escuelaRepository.save(escuela);
 	}
 
 	/**
