@@ -16,9 +16,11 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +45,7 @@ import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
+import es.uniovi.domain.Zona;
 import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
@@ -53,6 +56,7 @@ import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.UsuarioDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.dto.ViaRootDto;
+import es.uniovi.dto.ZonaDto;
 import es.uniovi.exception.ImagenNoValidaException;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
@@ -81,6 +85,30 @@ public abstract class BaseController {
 		return new ApiResponse<>("Error general del servidor", Constantes.ERROR_INTERNO);
 	}
 	
+	@ExceptionHandler(BindException.class)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	protected ApiResponse<Map<String, String>> handleException(BindException e) {
+		return getObjectErrors(e);
+	}
+
+	private ApiResponse<Map<String, String>> getObjectErrors(BindException e) {
+		Map<String, String> errors = new HashMap<>();
+		e.getBindingResult().getAllErrors().forEach(error -> {
+			if (error instanceof FieldError) {
+				String fieldName = ((FieldError) error).getField();
+				String errorMessage = error.getDefaultMessage();
+				errors.put(fieldName, errorMessage);
+			} else {
+				ObjectError objectError = error;
+				String objectName = objectError.getObjectName();
+				String errorMessage = objectError.getDefaultMessage();
+				errors.put(objectName, errorMessage);
+				logger.info(error.getClass());
+			}
+		});
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
+	
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	protected ApiResponse<Map<String, String>> handleException(MissingServletRequestParameterException e) {
@@ -100,21 +128,7 @@ public abstract class BaseController {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ApiResponse<Map<String, String>> handleException(MethodArgumentNotValidException e) {
-		Map<String, String> errors = new HashMap<>();
-		e.getBindingResult().getAllErrors().forEach(error -> {
-			if (error instanceof FieldError) {
-				String fieldName = ((FieldError) error).getField();
-				String errorMessage = error.getDefaultMessage();
-				errors.put(fieldName, errorMessage);
-			} else if (error instanceof ObjectError) {
-				ObjectError objectError = (ObjectError) error;
-				String objectName = objectError.getObjectName();
-				String errorMessage = objectError.getDefaultMessage();
-				errors.put(objectName, errorMessage);
-				logger.info(error.getClass());
-			}
-		});
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+		return getObjectErrors(e);
 	}
 
 	@ResponseStatus(code = HttpStatus.NOT_FOUND)
@@ -187,7 +201,18 @@ public abstract class BaseController {
 	protected ApiResponse<Map<String, Object>> handleException(NoAutorizadoException e) {
 		Map<String, Object> errors = Collections.singletonMap("error", "No autorizado");
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
-	}	
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(PropertyReferenceException.class)
+	protected ApiResponse<Map<String, Object>> handleException(PropertyReferenceException e) {
+		Map<String, Object> errors = Collections.singletonMap("error",
+				"Propiedad " +
+				e.getPropertyName() +
+				" no se encuentra en " +
+				e.getType());
+		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	}
 
 	///////////////////////////////
 	////// mapeo DTO-Entity ///////
@@ -345,6 +370,27 @@ public abstract class BaseController {
 		listaPaginada.setContenido(contenido);
 		listaPaginada.setTotalPaginas(paginaSectores.getTotalPages());
 		return listaPaginada;
+	}
+	
+	protected ListaPaginada<ZonaDto> pageZonasToDto(Page<Zona> paginaZonas){
+		ListaPaginada<ZonaDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaZonas.getSize());
+		listaPaginada.setPage(paginaZonas.getNumber());
+		listaPaginada.setContenido(toZonasDto(paginaZonas.getContent()));
+		listaPaginada.setTotalPaginas(paginaZonas.getTotalPages());
+		return listaPaginada;
+	}
+	
+	protected ZonaDto toDto(Zona zona) {
+		return modelMapper.map(zona, ZonaDto.class);
+	}
+
+	private List<ZonaDto> toZonasDto(List<Zona> zonas) {
+		return zonas.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	protected Zona toEntity(ZonaDto zonaDto) {
+		return modelMapper.map(zonaDto, Zona.class);
 	}
 	
 }

@@ -21,11 +21,13 @@ public interface EscuelaService {
 	/**
 	 * Obtine la página de escuelas para los parámetros pasados
 	 * 
-	 * @param page El número de página
-	 * @param size El tamaño de la página
+	 * @param page   El número de página
+	 * @param size   El tamaño de la página
+	 * @param idZona La zona por la que filtrar los resultados
 	 * @return La página de resultados
+	 * @throws NoEncontradoException 
 	 */
-	Page<Escuela> getEscuelas(Integer page, Integer size);
+	Page<Escuela> getEscuelas(Integer page, Integer size, Long idZona) throws NoEncontradoException;
 
 	/**
 	 * Obtiene la Escuela cuyo id es pasado

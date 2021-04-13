@@ -8,8 +8,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -24,10 +27,9 @@ import org.hibernate.search.annotations.Indexed;
 import es.uniovi.search.analyzer.ApiAnalyzer;
 import es.uniovi.search.analyzer.NombreEscuelaAnalyzer;
 import es.uniovi.validation.Coordenadas;
-import es.uniovi.validation.PaisIso;
 
-@Entity
 @Coordenadas
+@Entity(name = "escuela")
 @Indexed(index = "Escuela")
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
 public class Escuela implements Ubicable, Serializable {
@@ -37,10 +39,7 @@ public class Escuela implements Ubicable, Serializable {
 	private Double latitud;
 	
 	private Double longitud;
-	
-	@PaisIso
-	private String paisIso;
-	
+		
 	@Column(length = 5000)
 	@Field(analyzer = @Analyzer(impl = ApiAnalyzer.class))
 	private String informacion;
@@ -64,6 +63,10 @@ public class Escuela implements Ubicable, Serializable {
 	           mappedBy = "escuela",
 	           cascade = { CascadeType.ALL })
 	private Set<@NotNull Sector> sectores = new HashSet<>();
+	
+	@ManyToOne(optional = true)
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_ESCUELA_ZONA"))
+	private Zona zona;
 
 	public Escuela() {
 		super();
@@ -111,14 +114,6 @@ public class Escuela implements Ubicable, Serializable {
 		this.longitud = longitud;
 	}
 
-	public String getPaisIso() {
-		return paisIso;
-	}
-
-	public void setPaisIso(String paisIso) {
-		this.paisIso = paisIso;
-	}
-
 	public String getInformacion() {
 		return informacion;
 	}
@@ -133,6 +128,14 @@ public class Escuela implements Ubicable, Serializable {
 
 	public void setCierresTemporada(Set<CierreTemporada> cierresTemporada) {
 		this.cierresTemporada = cierresTemporada;
+	}
+
+	public Zona getZona() {
+		return zona;
+	}
+
+	public void setZona(Zona zona) {
+		this.zona = zona;
 	}
 
 	@Override
