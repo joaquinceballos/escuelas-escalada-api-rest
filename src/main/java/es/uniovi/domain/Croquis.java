@@ -17,9 +17,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "sector", "nombre" }, name = "UQ_CROQUIS_NOMBRE"))
-public class Croquis implements Serializable {
+public class Croquis implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 8145877771457034636L;
 
@@ -100,6 +102,16 @@ public class Croquis implements Serializable {
 	@Override
 	public String toString() {
 		return "Croquis [id=" + id + ", sector=" + sector + ", nombre=" + nombre + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.CROQUIS;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.sector.pathLog() + "/croquis/" + this.getId();
 	}
 
 }

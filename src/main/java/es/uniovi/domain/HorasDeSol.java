@@ -10,11 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.validation.RangoHorario;
 
 @Entity
 @RangoHorario
-public class HorasDeSol implements Serializable, PeriodoHoras {
+public class HorasDeSol implements Serializable, PeriodoHoras, RecursoLogeable {
 
 	private static final long serialVersionUID = -6138325795162587160L;
 
@@ -69,6 +70,16 @@ public class HorasDeSol implements Serializable, PeriodoHoras {
 
 	public void setSector(Sector sector) {
 		this.sector = sector;
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.HORAS_DE_SOL;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.sector.pathLog() + "/horassol/" + this.id;
 	}
 
 }

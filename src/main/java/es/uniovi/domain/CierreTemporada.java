@@ -12,12 +12,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.validation.PeriodoFechas;
 import es.uniovi.validation.ValueOfEnum;
 
 @Entity
 @PeriodoFechas
-public class CierreTemporada implements Serializable, PeriodoDias {
+public class CierreTemporada implements Serializable, PeriodoDias, RecursoLogeable {
 
 	private static final long serialVersionUID = -1119871856531367284L;
 
@@ -87,6 +88,16 @@ public class CierreTemporada implements Serializable, PeriodoDias {
 	public String toString() {
 		return "CierreTemporada [id=" + id + ", inicio=" + inicio + ", fin=" + fin + ", motivoCierre=" + motivoCierre
 				+ "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.CIERRE_TEMPORADA;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.escuela.pathLog() + "/cierres/" + this.id;
 	}
 
 }

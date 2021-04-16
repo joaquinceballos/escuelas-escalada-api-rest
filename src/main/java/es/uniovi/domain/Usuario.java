@@ -18,13 +18,14 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Past;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.validation.PaisIso;
 
 @Entity
 @Table(uniqueConstraints = {
 		@UniqueConstraint(columnNames = "email", name = "uq_usuario_email"),
 		@UniqueConstraint(columnNames = "username", name = "uq_usuario_username") })
-public class Usuario implements Serializable {
+public class Usuario implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 5481015999454416823L;
 
@@ -63,6 +64,9 @@ public class Usuario implements Serializable {
 	
 	@OneToMany(mappedBy = "usuario")
 	private List<Ascension> ascenciones;
+	
+	@OneToMany(mappedBy = "usuario")
+	private List<LogModificaciones> modificaciones;
 
 	public Usuario() {
 		super();
@@ -154,12 +158,30 @@ public class Usuario implements Serializable {
 
 	public void setPais(String pais) {
 		this.pais = pais;
+	}	
+
+	public List<LogModificaciones> getModificaciones() {
+		return modificaciones;
+	}
+
+	public void setModificaciones(List<LogModificaciones> modificaciones) {
+		this.modificaciones = modificaciones;
 	}
 
 	@Override
 	public String toString() {
 		return "Usuario [id=" + id + ", nombre=" + nombre + ", password=" + password + ", email=" + email + ", roles="
 				+ roles + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.USUARIO;
+	}
+
+	@Override
+	public String pathLog() {
+		return "/usuarios/" + this.id;
 	}
 
 }

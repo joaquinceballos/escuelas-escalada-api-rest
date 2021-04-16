@@ -12,9 +12,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+
 @Entity
 @IdClass(TrazoViaPK.class)
-public class TrazoVia implements Serializable {
+public class TrazoVia implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 7095706231971332391L;
 	
@@ -64,6 +66,22 @@ public class TrazoVia implements Serializable {
 	@Override
 	public String toString() {
 		return "TrazoVia [via=" + via + ", croquis=" + croquis + "]";
+	}
+
+	@Override
+	public Long getId() {
+		// no es trazable!!
+		return via.getId(); 
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.TRAZO_VIA;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.croquis.pathLog() + "via" + this.via.getId();
 	}
 	
 }

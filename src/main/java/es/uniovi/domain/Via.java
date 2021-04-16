@@ -21,12 +21,13 @@ import org.hibernate.search.annotations.Indexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.search.analyzer.NombreViaAnalyzer;
 
 @Entity
 @Indexed(index = "Via")
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_VIA_NOMBRE_SECTOR", columnNames = { "NOMBRE", "SECTOR" }))
-public class Via implements Serializable {
+public class Via implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = -6118720572978189595L;
 
@@ -156,6 +157,16 @@ public class Via implements Serializable {
 	public String toString() {
 		return "Via [id=" + id + ", nombre=" + nombre + ", grado=" + grado + ", numeroChapas=" + numeroChapas
 				+ ", longitud=" + longitud + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.VIA;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.sector.pathLog() + "/vias/" + this.id;
 	}
 
 }
