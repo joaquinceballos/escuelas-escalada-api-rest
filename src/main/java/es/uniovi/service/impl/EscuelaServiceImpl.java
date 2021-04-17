@@ -12,8 +12,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +34,8 @@ import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.HorasDeSol;
+import es.uniovi.domain.LogModificaciones.AccionLog;
+import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
@@ -53,6 +58,8 @@ import es.uniovi.service.LogModificacionesService;
 
 @Service
 public class EscuelaServiceImpl implements EscuelaService {
+	
+	private static final Logger logger = LogManager.getLogger(EscuelaServiceImpl.class);
 
 	private static final Supplier<? extends NoSuchElementException> INCONSISTENCIA_EXCEPTION_SUPPLIER = () ->
 		new NoSuchElementException("Inconsistencia en los datos, recurso debería de existir");		
@@ -124,7 +131,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 				throw new RestriccionDatosException("Zona no existe: " + escuela.getZona().getId());
 			}
 			Escuela savedEscuela = doSaveEscuela(escuela);
-			logModificacionesService.logCrear(savedEscuela);
+			logModificaciones(savedEscuela, AccionLog.CREAR);
 			return savedEscuela;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -190,7 +197,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 						String.format("Nombre de sector ya existe en la escuela %s", sector.getEscuela().getId()));
 			}
 			doSaveSector(sector);
-			logModificacionesService.logCrear(sector);
+			logModificaciones(sector, AccionLog.CREAR);
 			return sector;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -245,7 +252,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 			Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 			asociaSectorVia(sector, via);
 			Via savedVia = viaRepository.save(via);
-			logModificacionesService.logCrear(savedVia);
+			logModificaciones(savedVia, AccionLog.CREAR);
 			return savedVia;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -401,7 +408,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	public void deleteEscuela(Long id) throws NoEncontradoException {
 		Escuela escuela = doGetEscuela(id);
 		escuelaRepository.delete(escuela);
-		logModificacionesService.logBorrar(escuela);
+		logModificaciones(escuela, AccionLog.BORRAR);
 	}
 
 	@Override
@@ -416,7 +423,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		escuela.getSectores().remove(sector);
 		escuelaRepository.save(escuela);
 		sectorRepository.delete(sector);
-		logModificacionesService.logBorrar(sector);
+		logModificaciones(sector, AccionLog.BORRAR);
 	}
 
 	@Override
@@ -431,14 +438,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 		sector.getVias().remove(via);
 		sectorRepository.save(sector);
 		viaRepository.delete(via);
-		logModificacionesService.logBorrar(via);
+		logModificaciones(via, AccionLog.BORRAR);
 	}
 
 	@Override
 	public Escuela actualizaEscuela(Long id, Escuela escuela2) throws NoEncontradoException {
 		Escuela escuela = doGetEscuela(id);
 		escuela.setNombre(escuela2.getNombre());
-		logModificacionesService.logActualizar(escuela);
+		logModificaciones(escuela, AccionLog.ACTUALIZAR);
 		return escuelaRepository.save(escuela);
 	}
 
@@ -450,7 +457,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		sector.setNombre(sector2.getNombre());
 		actualizaHorasDeSol(sector2, sector);
 		sector.setInformacion(sector2.getInformacion());
-		logModificacionesService.logActualizar(sector);
+		logModificaciones(sector, AccionLog.ACTUALIZAR);
 		return sectorRepository.save(sector);
 	}
 
@@ -479,7 +486,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		via.setLongitud(via2.getLongitud());
 		via.setNombre(via2.getNombre());
 		via.setNumeroChapas(via2.getNumeroChapas());
-		logModificacionesService.logActualizar(via);
+		logModificaciones(via, AccionLog.ACTUALIZAR);
 		return viaRepository.save(via);
 	}
 
@@ -501,7 +508,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		imagenService.checkImagen(croquis.getImagen());
 		try {
 			Croquis savedCroquis = croquisRepository.save(croquis);
-			logModificacionesService.logCrear(savedCroquis);
+			logModificaciones(savedCroquis, AccionLog.CREAR);
 			return savedCroquis;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -520,7 +527,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 					"escuela/sector/croquis",
 					idEscuela + "/" + idSector + "/" + idCroquis));
 		croquisRepository.delete(croquis);
-		logModificacionesService.logBorrar(croquis);
+		logModificaciones(croquis, AccionLog.BORRAR);
 	}
 
 	@Override
@@ -540,7 +547,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		}
 		try {
 			TrazoVia savedTrazoVia = trazoViaRepository.save(trazoVia);
-			logModificacionesService.logCrear(savedTrazoVia);
+			logModificaciones(savedTrazoVia, AccionLog.CREAR);
 			return savedTrazoVia;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -575,7 +582,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 				.findByCroquisAndVia(croquis, via)
 				.orElseThrow(() -> new NoEncontradoException("croquis, via", idCroquis + ", " + idVia));
 		trazoVia.setPuntos(trazoViaActualizado.getPuntos());
-		logModificacionesService.logActualizar(trazoVia);
+		logModificaciones(trazoVia, AccionLog.ACTUALIZAR);
 		return trazoViaRepository.save(trazoVia);
 	}
 
@@ -592,14 +599,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 				.findByCroquisAndVia(croquis, via)
 				.orElseThrow(() -> new NoEncontradoException("croquis, via", idCroquis + ", " + idVia));
 		trazoViaRepository.delete(trazoVia);
-		logModificacionesService.logBorrar(trazoVia);
+		logModificaciones(trazoVia, AccionLog.BORRAR);
 	}
 
 	@Override
 	public CierreTemporada addCierreTemporada(Long idEscuela, CierreTemporada cierreTemporada) throws ServiceException {
 		asociaNuevoCierre(doGetEscuela(idEscuela), cierreTemporada);
 		CierreTemporada savedCierre = cierreTemporadaReporitory.save(cierreTemporada);
-		logModificacionesService.logCrear(savedCierre);
+		logModificaciones(savedCierre, AccionLog.CREAR);
 		return savedCierre;
 	}
 	
@@ -622,7 +629,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		escuela.getCierresTemporada().remove(cierreTemporada);
 		escuelaRepository.save(escuela);
 		cierreTemporadaReporitory.delete(cierreTemporada);
-		logModificacionesService.logBorrar(cierreTemporada);
+		logModificaciones(cierreTemporada, AccionLog.BORRAR);
 	}
 
 	private CierreTemporada doGetCierreDeEscuela(Long idCierre, Escuela escuela) throws NoEncontradoException {
@@ -637,6 +644,23 @@ public class EscuelaServiceImpl implements EscuelaService {
 			throw new NoEncontradoException("escuela/cierre", escuela.getId() + "/" + idCierre);
 		}
 		return cierreTemporadaReporitory.findById(idCierre).orElseThrow(INCONSISTENCIA_EXCEPTION_SUPPLIER);
+	}
+
+	private void logModificaciones(RecursoLogeable logeable, AccionLog accionLog) {
+		try {
+			if (AccionLog.CREAR.equals(accionLog)) {
+				logModificacionesService.logCrear(logeable);
+			} else if (AccionLog.ACTUALIZAR.equals(accionLog)) {
+				logModificacionesService.logActualizar(logeable);
+			} else if (AccionLog.BORRAR.equals(accionLog)) {
+				logModificacionesService.logBorrar(logeable);
+			} else {
+				throw new IllegalArgumentException("Accion de log no esperada: " + accionLog);
+			}
+		} catch (DataAccessException e) {
+			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
+			logger.debug(e);
+		}
 	}
 	
 }

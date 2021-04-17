@@ -1,10 +1,15 @@
 package es.uniovi.service.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import es.uniovi.domain.LogModificaciones.AccionLog;
+import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -16,6 +21,8 @@ import es.uniovi.service.ZonaService;
 
 @Service
 public class ZonaServiceImpl implements ZonaService {
+	
+	private static final Logger logger = LogManager.getLogger(ZonaServiceImpl.class);
 
 	@Autowired
 	private ZonaRepository zonaRepository;
@@ -46,7 +53,7 @@ public class ZonaServiceImpl implements ZonaService {
 			throw new RestriccionDatosException("Zona ya existe");
 		}
 		Zona savedZona = zonaRepository.save(zona);
-		logModificacionesService.logCrear(zona);
+		logModificaciones(zona, AccionLog.CREAR);
 		return savedZona;
 	}
 
@@ -67,7 +74,7 @@ public class ZonaServiceImpl implements ZonaService {
 		Zona persistida = doGetZona(id);
 		persistida.setPais(zona.getPais());
 		persistida.setRegion(zona.getRegion());
-		logModificacionesService.logActualizar(persistida);
+		logModificaciones(persistida, AccionLog.ACTUALIZAR);
 		return zonaRepository.save(persistida);
 	}
 
@@ -77,8 +84,25 @@ public class ZonaServiceImpl implements ZonaService {
 		if (zonaRepository.countEscuelasById(zona.getId()) > 0) {
 			throw new RestriccionDatosException("No es posible borrar la zona");
 		}
-		logModificacionesService.logBorrar(zona);
+		logModificaciones(zona, AccionLog.BORRAR);
 		zonaRepository.delete(zona);
+	}
+	
+	private void logModificaciones(RecursoLogeable logeable, AccionLog accionLog) {
+		try {
+			if (AccionLog.CREAR.equals(accionLog)) {
+				logModificacionesService.logCrear(logeable);
+			} else if (AccionLog.ACTUALIZAR.equals(accionLog)) {
+				logModificacionesService.logActualizar(logeable);
+			} else if (AccionLog.BORRAR.equals(accionLog)) {
+				logModificacionesService.logBorrar(logeable);
+			} else {
+				throw new IllegalArgumentException("Accion de log no esperada: " + accionLog);
+			}
+		} catch (DataAccessException e) {
+			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
+			logger.debug(e);
+		}
 	}
 
 }

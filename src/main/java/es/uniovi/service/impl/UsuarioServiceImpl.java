@@ -3,7 +3,10 @@ package es.uniovi.service.impl;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.LogModificaciones.AccionLog;
 import es.uniovi.domain.NombreRol;
+import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Rol;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
@@ -31,6 +36,8 @@ import es.uniovi.service.UsuarioService;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
+	
+	private static final Logger logger = LogManager.getLogger(UsuarioServiceImpl.class);
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -64,7 +71,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 					.orElseThrow(() -> new NoSuchElementException("rol USER"));
 			usuario.setRoles(Arrays.asList(rolUser));
 			Usuario savedUsuario = usuarioRepository.save(usuario);
-			logModificacionesService.logCrear(savedUsuario);
+			logModificaciones(savedUsuario, AccionLog.CREAR);
 			return savedUsuario;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -78,7 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				throw new NoEncontradoException("usuario.id", usuario.getId());
 			}
 			codificaPassword(usuario);
-			logModificacionesService.logActualizar(usuario);
+			logModificaciones(usuario, AccionLog.ACTUALIZAR);
 			return usuarioRepository.save(usuario);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -88,7 +95,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public void deleteUsuario(Long idUsuario) throws NoEncontradoException {
 		Usuario usuario = doGetUsuario(idUsuario);
-		logModificacionesService.logBorrar(usuario);
+		logModificaciones(usuario, AccionLog.BORRAR);
 		usuarioRepository.delete(usuario);
 	}
 
@@ -102,7 +109,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		ascension.setUsuario(doGetUsuario(idUsuario));
 		ascension.setVia(doGetVia(idVia));
 		Ascension savedAscension = ascensionRepository.save(ascension);
-		logModificacionesService.logCrear(savedAscension);
+		logModificaciones(savedAscension, AccionLog.CREAR);
 		return savedAscension;
 	}
 
@@ -115,7 +122,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if (usuario.equals(ascension.getUsuario()) && via.equals(ascension.getVia())) {
 			actualizada.setUsuario(usuario);
 			actualizada.setVia(via);
-			logModificacionesService.logActualizar(actualizada);
+			logModificaciones(actualizada, AccionLog.ACTUALIZAR);
 			return ascensionRepository.save(actualizada);
 		}
 		throw new NoEncontradoException(
@@ -146,5 +153,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 		return usuarioRepository.findByUsername(username).orElse(null);
 	}
-
+	
+	private void logModificaciones(RecursoLogeable logeable, AccionLog accionLog) {
+		try {
+			if (AccionLog.CREAR.equals(accionLog)) {
+				logModificacionesService.logCrear(logeable);
+			} else if (AccionLog.ACTUALIZAR.equals(accionLog)) {
+				logModificacionesService.logActualizar(logeable);
+			} else if (AccionLog.BORRAR.equals(accionLog)) {
+				logModificacionesService.logBorrar(logeable);
+			} else {
+				throw new IllegalArgumentException("Accion de log no esperada: " + accionLog);
+			}
+		} catch (DataAccessException e) {
+			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
+			logger.debug(e);
+		}
+	}
+	
 }
