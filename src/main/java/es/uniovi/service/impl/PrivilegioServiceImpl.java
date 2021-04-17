@@ -1,48 +1,44 @@
 package es.uniovi.service.impl;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.NombrePrivilegio;
-import es.uniovi.domain.NombreRol;
+import es.uniovi.domain.Privilegio;
 import es.uniovi.domain.Rol;
+import es.uniovi.domain.Usuario;
 import es.uniovi.exception.NoAutorizadoException;
-import es.uniovi.repository.RolRepository;
 import es.uniovi.service.PrivilegioService;
+import es.uniovi.service.UsuarioService;
 
 @Service
 public class PrivilegioServiceImpl implements PrivilegioService {
-
+	
 	@Autowired
-	private RolRepository rolRepository;
+	private UsuarioService usuarioService;
 
 	@Override
-	public void checkPrivilegioEscritura() throws NoAutorizadoException {
-		checkPrivilegio(NombrePrivilegio.ESCRITURA);
-	}
-
-	@Override
-	public void checkPrivilegioBorrado() throws NoAutorizadoException {
-		checkPrivilegio(NombrePrivilegio.BORRADO);		
-	}
-
-	private void checkPrivilegio(NombrePrivilegio privilegio) throws NoAutorizadoException {
-		for (GrantedAuthority grantedAuthority : getAuthorities()) {
-			NombreRol nombreRol = NombreRol.valueOf(grantedAuthority.getAuthority().replace("ROLE_", ""));
-			Rol rol = rolRepository.findByNombre(nombreRol).orElseThrow();
-			if (rol.getPrivilegios().stream().anyMatch(p -> privilegio.equals(p.getNombre()))) {
-				return;
-			}
+	public Boolean checkPrivilegio(NombrePrivilegio nombre) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Usuario usuario = null;
+		try {
+			usuario = usuarioService.getUsuario(authentication.getName());
+		} catch (NoAutorizadoException e) {
+			return false;
 		}
-		throw new NoAutorizadoException("Rol del usuario no permite grabar nuevos datos");
-	}
-
-	private Collection<? extends GrantedAuthority> getAuthorities() {
-		return SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		if (usuario == null) {
+			return false;
+		}
+		return usuario
+				.getRoles()
+				.stream()
+				.map(Rol::getPrivilegios)
+				.anyMatch(l -> l
+						.stream()
+						.map(Privilegio::getNombre)
+						.anyMatch(nombre::equals));
 	}
 
 }

@@ -1,21 +1,15 @@
 package es.uniovi.service;
 
-import es.uniovi.exception.NoAutorizadoException;
+import es.uniovi.domain.NombrePrivilegio;
 
 public interface PrivilegioService {
 
 	/**
-	 * Checkea que el usuario autenticado tenga privilegio de escritura
+	 * Checkea si el usuario autenticado tiene el privilegio cuyo nombre es pasado
 	 * 
-	 * @throws NoAutorizadoException
+	 * @param nombre El nombre del privilegio
+	 * @return Si el usuario autenticado tiene el privilegio
 	 */
-	void checkPrivilegioEscritura() throws NoAutorizadoException;
-
-	/**
-	 * Checkea que el usuario autenticado tenga privilegio de borrado
-	 * 
-	 * @throws NoAutorizadoException
-	 */
-	void checkPrivilegioBorrado() throws NoAutorizadoException;
+	Boolean checkPrivilegio(NombrePrivilegio nombre);
 
 }
