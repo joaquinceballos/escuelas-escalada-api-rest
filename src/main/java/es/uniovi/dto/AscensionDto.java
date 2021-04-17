@@ -20,7 +20,7 @@ public class AscensionDto {
 
 	private ViaDto via;
 
-	private UsuarioDto usuario;
+	private UsuarioPublicoDto usuario;
 
 	public AscensionDto() {
 		super();
@@ -66,11 +66,11 @@ public class AscensionDto {
 		this.via = via;
 	}
 
-	public UsuarioDto getUsuario() {
+	public UsuarioPublicoDto getUsuario() {
 		return usuario;
 	}
 
-	public void setUsuario(UsuarioDto usuario) {
+	public void setUsuario(UsuarioPublicoDto usuario) {
 		this.usuario = usuario;
 	}
 

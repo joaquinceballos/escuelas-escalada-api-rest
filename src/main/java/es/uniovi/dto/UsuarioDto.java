@@ -11,64 +11,26 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import es.uniovi.validation.PaisIso;
-
-public class UsuarioDto {
-
-	private Long id;
-
-	@NotBlank
-	private String nombre;
-
-	@Email
-	@NotBlank
-	private String email;
+public class UsuarioDto extends UsuarioPublicoDto {
 
 	@NotBlank
 	@JsonInclude(Include.NON_NULL)
 	private String password;
-	
+
 	@NotBlank
 	@Size(min = 4, max = 20)
 	@Pattern(regexp = "[a-zA-Z0-9]+")
 	private String username;
 
-	@NotBlank
-	private String apellido1;
-
-	private String apellido2;
-	
 	@Past
 	private LocalDate nacimiento;
-	
-	@PaisIso
-	private String pais;
+
+	@Email
+	@NotBlank
+	private String email;
+
 	public UsuarioDto() {
 		super();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email.trim();
 	}
 
 	public String getPassword() {
@@ -87,24 +49,6 @@ public class UsuarioDto {
 		this.username = username.trim();
 	}
 
-	public String getApellido1() {
-		return apellido1;
-	}
-
-	public void setApellido1(String apellido1) {
-		this.apellido1 = apellido1.trim();
-	}
-
-	public String getApellido2() {
-		return apellido2;
-	}
-
-	public void setApellido2(String apellido2) {
-		if (apellido2 != null) {
-			this.apellido2 = apellido2.trim();
-		}
-	}
-
 	public LocalDate getNacimiento() {
 		return nacimiento;
 	}
@@ -113,17 +57,20 @@ public class UsuarioDto {
 		this.nacimiento = nacimiento;
 	}
 
-	public String getPais() {
-		return pais;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setPais(String pais) {
-		this.pais = pais;
+	public void setEmail(String email) {
+		this.email = email.trim();
 	}
 
 	@Override
 	public String toString() {
-		return "UsuarioDto [id=" + id + ", nombre=" + nombre + ", email=" + email + ", password=" + password + "]";
+		return "UsuarioDto [password=" + password + ", username=" + username + ", nacimiento=" + nacimiento
+				+ ", getId()=" + getId() + ", getNombre()=" + getNombre() + ", getEmail()=" + getEmail()
+				+ ", getApellido1()=" + getApellido1() + ", getApellido2()=" + getApellido2() + ", getPais()="
+				+ getPais() + "]";
 	}
 
 }

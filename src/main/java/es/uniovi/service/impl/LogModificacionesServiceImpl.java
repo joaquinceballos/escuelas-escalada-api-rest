@@ -1,6 +1,7 @@
 package es.uniovi.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +9,8 @@ import org.modelmapper.ConfigurationException;
 import org.modelmapper.MappingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,8 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.uniovi.controller.BaseController;
 import es.uniovi.domain.LogModificaciones;
 import es.uniovi.domain.LogModificaciones.AccionLog;
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Usuario;
+import es.uniovi.filtro.FiltroCambios;
 import es.uniovi.repository.LogModificacionesRepository;
 import es.uniovi.repository.UsuarioRepository;
 import es.uniovi.service.LogModificacionesService;
@@ -76,4 +81,19 @@ public class LogModificacionesServiceImpl implements LogModificacionesService {
 		}
 		return log;
 	}
+
+	@Override
+	public Page<LogModificaciones> getUltimosCambios(Pageable pageable, FiltroCambios filtro) {
+		EnumSet<TipoRecurso> tipos = EnumSet.of(
+				TipoRecurso.ESCUELA,
+				TipoRecurso.ASCENSION,
+				TipoRecurso.COMENTARIO,
+				TipoRecurso.CROQUIS,
+				TipoRecurso.SECTOR,
+				TipoRecurso.TRAZO_VIA,
+				TipoRecurso.VIA,
+				TipoRecurso.ZONA);		
+		return repository.findModificacionesPublicas(tipos, filtro.getIdRecurso(), filtro.getIdUsuario(), pageable);
+	}
+	
 }

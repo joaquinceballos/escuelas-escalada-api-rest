@@ -1,6 +1,11 @@
 package es.uniovi.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.uniovi.domain.LogModificaciones;
 import es.uniovi.domain.RecursoLogeable;
+import es.uniovi.filtro.FiltroCambios;
 
 public interface LogModificacionesService {
 
@@ -24,5 +29,14 @@ public interface LogModificacionesService {
 	 * @param recursoLogeable
 	 */
 	void logBorrar(RecursoLogeable recursoLogeable);
+
+	/**
+	 * Retorna los últimos cambios públicos en los datos
+	 * 
+	 * @param pageable Parámetros de paginación
+	 * @param filtro   El filtro
+	 * @return La página de resultados
+	 */
+	Page<LogModificaciones> getUltimosCambios(Pageable pageable, FiltroCambios filtro);
 
 }

@@ -13,10 +13,11 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name = "logModificaciones")
 @Table(indexes = {
 		@Index(name = "IND_LOG_MODIFICACIONES_FECHA", columnList = "fecha"),
-		@Index(name = "IND_LOG_MODIFICACIONES_ID_RECURSO", columnList = "idRecurso") })
+		@Index(name = "IND_LOG_MODIFICACIONES_ID_RECURSO", columnList = "idRecurso"),
+		@Index(name = "IND_LOG_MODIFICACIONES_USUARIO", columnList = "usuario") })
 public class LogModificaciones implements Serializable {
 
 	private static final long serialVersionUID = -4342654337217740102L;
