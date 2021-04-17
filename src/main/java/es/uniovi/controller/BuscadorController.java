@@ -76,4 +76,5 @@ public class BuscadorController extends BaseController {
 			@RequestParam(name = "texto", required = true) String texto) {
 		return new ApiResponse<>(pageBuscaViaToDto(buscadorService.buscaVias(texto, page, size)), ApiResponseStatus.SUCCESS);
 	}
+
 }

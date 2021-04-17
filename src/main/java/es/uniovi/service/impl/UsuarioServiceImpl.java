@@ -3,7 +3,10 @@ package es.uniovi.service.impl;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.Ascension;
+import es.uniovi.domain.LogModificaciones.AccionLog;
 import es.uniovi.domain.NombreRol;
+import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Rol;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
@@ -26,10 +31,13 @@ import es.uniovi.repository.AscensionRepository;
 import es.uniovi.repository.RolRepository;
 import es.uniovi.repository.UsuarioRepository;
 import es.uniovi.repository.ViaRepository;
+import es.uniovi.service.LogModificacionesService;
 import es.uniovi.service.UsuarioService;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
+	
+	private static final Logger logger = LogManager.getLogger(UsuarioServiceImpl.class);
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -45,6 +53,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Autowired
 	private ViaRepository viaRepository;
+	
+	@Autowired
+	private LogModificacionesService logModificacionesService;
 
 	@Override
 	public Page<Usuario> getUsuarios(Integer page, Integer size) {
@@ -59,7 +70,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 					.findByNombre(NombreRol.valueOf("USER"))
 					.orElseThrow(() -> new NoSuchElementException("rol USER"));
 			usuario.setRoles(Arrays.asList(rolUser));
-			return usuarioRepository.save(usuario);
+			Usuario savedUsuario = usuarioRepository.save(usuario);
+			logModificaciones(savedUsuario, AccionLog.CREAR);
+			return savedUsuario;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
@@ -72,6 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				throw new NoEncontradoException("usuario.id", usuario.getId());
 			}
 			codificaPassword(usuario);
+			logModificaciones(usuario, AccionLog.ACTUALIZAR);
 			return usuarioRepository.save(usuario);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -80,7 +94,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void deleteUsuario(Long idUsuario) throws NoEncontradoException {
-		usuarioRepository.delete(doGetUsuario(idUsuario));
+		Usuario usuario = doGetUsuario(idUsuario);
+		logModificaciones(usuario, AccionLog.BORRAR);
+		usuarioRepository.delete(usuario);
 	}
 
 	@Override
@@ -92,7 +108,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Ascension addAscension(Long idUsuario, Long idVia, Ascension ascension) throws NoEncontradoException {
 		ascension.setUsuario(doGetUsuario(idUsuario));
 		ascension.setVia(doGetVia(idVia));
-		return ascensionRepository.save(ascension);
+		Ascension savedAscension = ascensionRepository.save(ascension);
+		logModificaciones(savedAscension, AccionLog.CREAR);
+		return savedAscension;
 	}
 
 	@Override
@@ -104,6 +122,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if (usuario.equals(ascension.getUsuario()) && via.equals(ascension.getVia())) {
 			actualizada.setUsuario(usuario);
 			actualizada.setVia(via);
+			logModificaciones(actualizada, AccionLog.ACTUALIZAR);
 			return ascensionRepository.save(actualizada);
 		}
 		throw new NoEncontradoException(
@@ -134,5 +153,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 		return usuarioRepository.findByUsername(username).orElse(null);
 	}
-
+	
+	private void logModificaciones(RecursoLogeable logeable, AccionLog accionLog) {
+		try {
+			if (AccionLog.CREAR.equals(accionLog)) {
+				logModificacionesService.logCrear(logeable);
+			} else if (AccionLog.ACTUALIZAR.equals(accionLog)) {
+				logModificacionesService.logActualizar(logeable);
+			} else if (AccionLog.BORRAR.equals(accionLog)) {
+				logModificacionesService.logBorrar(logeable);
+			} else {
+				throw new IllegalArgumentException("Accion de log no esperada: " + accionLog);
+			}
+		} catch (DataAccessException e) {
+			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
+			logger.debug(e);
+		}
+	}
+	
 }

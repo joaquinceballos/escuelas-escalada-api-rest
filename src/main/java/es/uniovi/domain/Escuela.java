@@ -24,6 +24,8 @@ import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.EscuelaDto;
 import es.uniovi.search.analyzer.ApiAnalyzer;
 import es.uniovi.search.analyzer.NombreEscuelaAnalyzer;
 import es.uniovi.validation.Coordenadas;
@@ -32,7 +34,7 @@ import es.uniovi.validation.Coordenadas;
 @Entity(name = "escuela")
 @Indexed(index = "Escuela")
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "NOMBRE" }, name = "UK_ESCUELA_NOMBRE") })
-public class Escuela implements Ubicable, Serializable {
+public class Escuela implements Ubicable, Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 8023830574582405343L;
 	
@@ -166,6 +168,21 @@ public class Escuela implements Ubicable, Serializable {
 	@Override
 	public String toString() {
 		return "Escuela [id=" + id + ", nombre=" + nombre + ", sectores=" + sectores + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.ESCUELA;
+	}
+
+	@Override
+	public String pathLog() {
+		return "/escuelas/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return EscuelaDto.class;
 	}
 
 }

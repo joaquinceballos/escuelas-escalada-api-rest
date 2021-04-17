@@ -10,8 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.AscensionDto;
+
 @Entity
-public class Ascension implements Serializable {
+public class Ascension implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 2165547851234215737L;
 
@@ -89,6 +92,21 @@ public class Ascension implements Serializable {
 	public String toString() {
 		return "Ascension [usuario=" + usuario + ", via=" + via + ", fecha=" + fecha + ", comentario=" + comentario
 				+ ", grado=" + grado + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.ASCENSION;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.usuario.pathLog() + "/ascensiones/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return AscensionDto.class;
 	}
 
 }
