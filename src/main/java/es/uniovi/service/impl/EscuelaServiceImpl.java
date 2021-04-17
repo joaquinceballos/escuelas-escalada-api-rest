@@ -35,11 +35,13 @@ import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
 import es.uniovi.domain.HorasDeSol;
 import es.uniovi.domain.LogModificaciones.AccionLog;
+import es.uniovi.domain.NombrePrivilegio;
 import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
 import es.uniovi.domain.Zona;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
@@ -55,6 +57,7 @@ import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.EscuelaService;
 import es.uniovi.service.ImagenService;
 import es.uniovi.service.LogModificacionesService;
+import es.uniovi.service.PrivilegioService;
 
 @Service
 public class EscuelaServiceImpl implements EscuelaService {
@@ -93,15 +96,22 @@ public class EscuelaServiceImpl implements EscuelaService {
 	
 	@Autowired
 	private LogModificacionesService logModificacionesService;
+	
+	@Autowired
+	private PrivilegioService privilegioService;
 
 	@Override
-	public Page<Escuela> getEscuelas(Integer page, Integer size, Long idZona) throws NoEncontradoException {
-			PageRequest pageable = PageRequest.of(page, size, Sort.by("nombre"));
+	public Page<Escuela> getEscuelas(
+			Integer page,
+			Integer size,
+			Long idZona) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
+		PageRequest pageable = PageRequest.of(page, size, Sort.by("nombre"));
 		if (idZona != null) {
 			if (!zonaRepository.existsById(idZona)) {
 				throw new NoEncontradoException("zona.id", idZona);
 			}
-			Zona zona = zonaRepository.findById(idZona).orElse(null);			
+			Zona zona = zonaRepository.findById(idZona).orElse(null);
 			return escuelaRepository.findAllByZona(pageable, zona);
 		} else {
 			return escuelaRepository.findAll(pageable);
@@ -109,12 +119,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Escuela getEscuela(Long id) throws NoEncontradoException {
+	public Escuela getEscuela(Long id) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		return doGetEscuela(id);
 	}
 
 	@Override
-	public Escuela addEscuela(Escuela escuela) throws RestriccionDatosException {
+	public Escuela addEscuela(Escuela escuela) throws RestriccionDatosException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		if(escuelaRepository.existsByNombre(escuela.getNombre())) {
 			throw new RestriccionDatosException("Escuela ya existe");
 		}
@@ -177,12 +189,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Set<Sector> getSectores(Long id) throws NoEncontradoException {
+	public Set<Sector> getSectores(Long id) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		return sectorRepository.findByEscuela(doGetEscuela(id));
 	}
 
 	@Override
-	public Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException {
+	public Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		Escuela escuela = doGetEscuela(idEscuela);
 		return doGetSectorDeEscuela(idSector, escuela);
 	}
@@ -190,6 +204,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Override
 	@Transactional
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
+		checkPrivilegioEscritura();
 		try {
 			asociaNuevoSector(doGetEscuela(idEscuela), sector);
 			if (sectorRepository.existsByEscuelaAndNombre(sector.getEscuela(), sector.getNombre())) {
@@ -233,21 +248,24 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException {
+	public Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = doGetSectorDeEscuela(idSector, escuela);
 		return sector.getVias();
 	}
 
 	@Override
-	public Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException {
+	public Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = doGetSectorDeEscuela(idSector, escuela);
-		return  doGetViaDeSector(idVia, sector);
+		return doGetViaDeSector(idVia, sector);
 	}
 
 	@Override
 	public Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException {
+		checkPrivilegioEscritura();
 		try {
 			Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 			asociaSectorVia(sector, via);
@@ -293,6 +311,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Override
 	public Escuela actualizaEscuela(Long id, JsonPatch jsonPatch) throws ServiceException {
+		checkPrivilegioEscritura();
 		try {
 			Escuela escuela = doGetEscuela(id);
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -405,14 +424,16 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public void deleteEscuela(Long id) throws NoEncontradoException {
+	public void deleteEscuela(Long id) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioBorrado();
 		Escuela escuela = doGetEscuela(id);
 		escuelaRepository.delete(escuela);
 		logModificaciones(escuela, AccionLog.BORRAR);
 	}
 
 	@Override
-	public void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException {
+	public void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioBorrado();
 		Escuela escuela = doGetEscuela(idEscuela);
 		Sector sector = escuela
 				.getSectores()
@@ -427,7 +448,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException {
+	public void deleteVia(
+			Long idEscuela,
+			Long idSector,
+			Long idVia) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioBorrado();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		Via via = sector
 				.getVias()
@@ -442,7 +467,8 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Escuela actualizaEscuela(Long id, Escuela escuela2) throws NoEncontradoException {
+	public Escuela actualizaEscuela(Long id, Escuela escuela2) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		Escuela escuela = doGetEscuela(id);
 		escuela.setNombre(escuela2.getNombre());
 		logModificaciones(escuela, AccionLog.ACTUALIZAR);
@@ -450,7 +476,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Sector actualizaSector(Long idEscuela, Long idSector, Sector sector2) throws NoEncontradoException {
+	public Sector actualizaSector(
+			Long idEscuela,
+			Long idSector,
+			Sector sector2) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		sector.setLatitud(sector2.getLatitud());
 		sector.setLongitud(sector2.getLongitud());
@@ -480,7 +510,12 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via2) throws NoEncontradoException {
+	public Via actualizaVia(
+			Long idEscuela,
+			Long idSector,
+			Long idVia,
+			Via via2) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		Via via = doGetViaDeSector(idVia, doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela)));
 		via.setGrado(via2.getGrado());
 		via.setLongitud(via2.getLongitud());
@@ -491,18 +526,24 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException {
+	public List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		return croquisRepository.findBySector(sector);
 	}
 
 	@Override
-	public Croquis getCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException {
+	public Croquis getCroquis(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		return doGetCroquisSector(idCroquis, doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela)));
 	}
 
 	@Override
 	public Croquis addCroquis(Long idEscuela, Long idSector, Croquis croquis) throws ServiceException {
+		checkPrivilegioEscritura();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		croquis.setSector(sector);
 		imagenService.checkImagen(croquis.getImagen());
@@ -516,7 +557,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException {
+	public void deleteCroquis(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis)	throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioBorrado();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		Croquis croquis = sector
 			.getCroquis()
@@ -537,6 +582,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 			Long idCroquis,
 			Long idVia,
 			TrazoVia trazoVia) throws ServiceException {
+		checkPrivilegioEscritura();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		Via via = doGetViaDeSector(idVia, sector);
 		Croquis croquis = doGetCroquisSector(idCroquis, sector);
@@ -574,7 +620,8 @@ public class EscuelaServiceImpl implements EscuelaService {
 			Long idSector,
 			Long idCroquis,
 			Long idVia,
-			TrazoVia trazoViaActualizado) throws NoEncontradoException {
+			TrazoVia trazoViaActualizado) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		Croquis croquis = doGetCroquisSector(idCroquis, sector);
 		Via via = doGetViaDeSector(idVia, sector);
@@ -591,7 +638,8 @@ public class EscuelaServiceImpl implements EscuelaService {
 			Long idEscuela,
 			Long idSector,
 			Long idCroquis,
-			Long idVia) throws NoEncontradoException {
+			Long idVia) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioBorrado();
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		Croquis croquis = doGetCroquisSector(idCroquis, sector);
 		Via via = doGetViaDeSector(idVia, sector);
@@ -604,6 +652,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Override
 	public CierreTemporada addCierreTemporada(Long idEscuela, CierreTemporada cierreTemporada) throws ServiceException {
+		checkPrivilegioEscritura();
 		asociaNuevoCierre(doGetEscuela(idEscuela), cierreTemporada);
 		CierreTemporada savedCierre = cierreTemporadaReporitory.save(cierreTemporada);
 		logModificaciones(savedCierre, AccionLog.CREAR);
@@ -624,6 +673,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 
 	@Override
 	public void deleteCierre(Long idEscuela, Long idCierre) throws ServiceException {
+		checkPrivilegioBorrado();
 		Escuela escuela = doGetEscuela(idEscuela);
 		CierreTemporada cierreTemporada = doGetCierreDeEscuela(idCierre, escuela);
 		escuela.getCierresTemporada().remove(cierreTemporada);
@@ -660,6 +710,24 @@ public class EscuelaServiceImpl implements EscuelaService {
 		} catch (DataAccessException e) {
 			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
 			logger.debug(e);
+		}
+	}
+
+	private void checkPrivilegioLectura() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.LECTURA);
+	}
+
+	private void checkPrivilegioEscritura() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.ESCRITURA);
+	}
+
+	private void checkPrivilegioBorrado() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.BORRADO);
+	}
+
+	private void checkPrivilegio(NombrePrivilegio nombre) throws NoAutorizadoException {
+		if (Boolean.FALSE.equals(privilegioService.checkPrivilegio(nombre))) {
+			throw new NoAutorizadoException("Usuario sin privilegios de " + nombre);
 		}
 	}
 	

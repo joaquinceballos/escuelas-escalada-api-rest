@@ -61,7 +61,7 @@ public class EscuelaController extends BaseController {
 	public ApiResponse<ListaPaginada<EscuelaDto>> getEscuelas(
 			@RequestParam(name = "idZona", required = false)  Long idZona,
 			@RequestParam(name = "page", defaultValue = "0", required = false) @Min(0) Integer page,
-			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) throws NoEncontradoException {
+			@RequestParam(name = "size", defaultValue = "50", required = false) @Min(1) @Max(100) Integer size) throws ServiceException {
 		return new ApiResponse<>(toDto(escuelaService.getEscuelas(page, size, idZona)), ApiResponseStatus.SUCCESS);
 	}
 
