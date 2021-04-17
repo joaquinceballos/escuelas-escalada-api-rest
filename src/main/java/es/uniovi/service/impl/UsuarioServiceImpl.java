@@ -26,6 +26,7 @@ import es.uniovi.repository.AscensionRepository;
 import es.uniovi.repository.RolRepository;
 import es.uniovi.repository.UsuarioRepository;
 import es.uniovi.repository.ViaRepository;
+import es.uniovi.service.LogModificacionesService;
 import es.uniovi.service.UsuarioService;
 
 @Service
@@ -45,6 +46,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Autowired
 	private ViaRepository viaRepository;
+	
+	@Autowired
+	private LogModificacionesService logModificacionesService;
 
 	@Override
 	public Page<Usuario> getUsuarios(Integer page, Integer size) {
@@ -59,7 +63,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 					.findByNombre(NombreRol.valueOf("USER"))
 					.orElseThrow(() -> new NoSuchElementException("rol USER"));
 			usuario.setRoles(Arrays.asList(rolUser));
-			return usuarioRepository.save(usuario);
+			Usuario savedUsuario = usuarioRepository.save(usuario);
+			logModificacionesService.logCrear(savedUsuario);
+			return savedUsuario;
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
 		}
@@ -72,6 +78,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				throw new NoEncontradoException("usuario.id", usuario.getId());
 			}
 			codificaPassword(usuario);
+			logModificacionesService.logActualizar(usuario);
 			return usuarioRepository.save(usuario);
 		} catch (DataIntegrityViolationException e) {
 			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
@@ -80,7 +87,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void deleteUsuario(Long idUsuario) throws NoEncontradoException {
-		usuarioRepository.delete(doGetUsuario(idUsuario));
+		Usuario usuario = doGetUsuario(idUsuario);
+		logModificacionesService.logBorrar(usuario);
+		usuarioRepository.delete(usuario);
 	}
 
 	@Override
@@ -92,7 +101,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public Ascension addAscension(Long idUsuario, Long idVia, Ascension ascension) throws NoEncontradoException {
 		ascension.setUsuario(doGetUsuario(idUsuario));
 		ascension.setVia(doGetVia(idVia));
-		return ascensionRepository.save(ascension);
+		Ascension savedAscension = ascensionRepository.save(ascension);
+		logModificacionesService.logCrear(savedAscension);
+		return savedAscension;
 	}
 
 	@Override
@@ -104,6 +115,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if (usuario.equals(ascension.getUsuario()) && via.equals(ascension.getVia())) {
 			actualizada.setUsuario(usuario);
 			actualizada.setVia(via);
+			logModificacionesService.logActualizar(actualizada);
 			return ascensionRepository.save(actualizada);
 		}
 		throw new NoEncontradoException(

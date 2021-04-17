@@ -1,7 +1,5 @@
 package es.uniovi.service.impl;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +11,7 @@ import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.filtro.FiltroZonas;
 import es.uniovi.repository.ZonaRepository;
+import es.uniovi.service.LogModificacionesService;
 import es.uniovi.service.ZonaService;
 
 @Service
@@ -20,6 +19,9 @@ public class ZonaServiceImpl implements ZonaService {
 
 	@Autowired
 	private ZonaRepository zonaRepository;
+	
+	@Autowired
+	private LogModificacionesService logModificacionesService;
 
 	@Override
 	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) {
@@ -43,7 +45,9 @@ public class ZonaServiceImpl implements ZonaService {
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
 			throw new RestriccionDatosException("Zona ya existe");
 		}
-		return zonaRepository.save(zona);
+		Zona savedZona = zonaRepository.save(zona);
+		logModificacionesService.logCrear(zona);
+		return savedZona;
 	}
 
 	@Override
@@ -63,6 +67,7 @@ public class ZonaServiceImpl implements ZonaService {
 		Zona persistida = doGetZona(id);
 		persistida.setPais(zona.getPais());
 		persistida.setRegion(zona.getRegion());
+		logModificacionesService.logActualizar(persistida);
 		return zonaRepository.save(persistida);
 	}
 
@@ -72,6 +77,7 @@ public class ZonaServiceImpl implements ZonaService {
 		if (zonaRepository.countEscuelasById(zona.getId()) > 0) {
 			throw new RestriccionDatosException("No es posible borrar la zona");
 		}
+		logModificacionesService.logBorrar(zona);
 		zonaRepository.delete(zona);
 	}
 
