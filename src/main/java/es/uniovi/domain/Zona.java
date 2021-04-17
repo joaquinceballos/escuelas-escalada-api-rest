@@ -16,6 +16,7 @@ import javax.validation.constraints.NotEmpty;
 import org.hibernate.annotations.Formula;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.ZonaDto;
 import es.uniovi.validation.PaisIso;
 
 @Entity(name = "zona")
@@ -124,6 +125,11 @@ public class Zona implements Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return "/zonas/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return ZonaDto.class;
 	}
 
 }

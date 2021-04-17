@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.validation.PeriodoFechas;
 import es.uniovi.validation.ValueOfEnum;
 
@@ -98,6 +99,11 @@ public class CierreTemporada implements Serializable, PeriodoDias, RecursoLogeab
 	@Override
 	public String pathLog() {
 		return this.escuela.pathLog() + "/cierres/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return CierreTemporadaDto.class;
 	}
 
 }

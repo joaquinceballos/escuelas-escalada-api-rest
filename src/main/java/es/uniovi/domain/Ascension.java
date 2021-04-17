@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.AscensionDto;
 
 @Entity
 public class Ascension implements Serializable, RecursoLogeable {
@@ -101,6 +102,11 @@ public class Ascension implements Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return this.usuario.pathLog() + "/ascensiones/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return AscensionDto.class;
 	}
 
 }

@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.HorasDeSolDto;
 import es.uniovi.validation.RangoHorario;
 
 @Entity
@@ -80,6 +81,11 @@ public class HorasDeSol implements Serializable, PeriodoHoras, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return this.sector.pathLog() + "/horassol/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return HorasDeSolDto.class;
 	}
 
 }

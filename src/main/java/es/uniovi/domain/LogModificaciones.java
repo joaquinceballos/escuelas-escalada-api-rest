@@ -6,10 +6,11 @@ import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -27,7 +28,7 @@ public class LogModificaciones implements Serializable {
 	}
 
 	@Id
-	@SequenceGenerator(name = "log_modificaciones_seq")
+	@GeneratedValue
 	private Long id;
 
 	private String path;
@@ -44,6 +45,9 @@ public class LogModificaciones implements Serializable {
 	private TipoRecurso tipoRecurso;
 	
 	private Long idRecurso;
+	
+	@Lob
+	private String valorRecurso;
 
 	public LogModificaciones() {
 		super();
@@ -103,6 +107,14 @@ public class LogModificaciones implements Serializable {
 
 	public void setIdRecurso(Long idRecurso) {
 		this.idRecurso = idRecurso;
+	}
+
+	public String getValorRecurso() {
+		return valorRecurso;
+	}
+
+	public void setValorRecurso(String valorRecurso) {
+		this.valorRecurso = valorRecurso;
 	}
 
 	@Override

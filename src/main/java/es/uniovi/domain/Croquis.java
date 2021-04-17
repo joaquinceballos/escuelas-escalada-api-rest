@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.CroquisDto;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "sector", "nombre" }, name = "UQ_CROQUIS_NOMBRE"))
@@ -112,6 +113,11 @@ public class Croquis implements Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return this.sector.pathLog() + "/croquis/" + this.getId();
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return CroquisDto.class;
 	}
 
 }

@@ -22,6 +22,7 @@ import org.hibernate.search.annotations.Indexed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.ViaDto;
 import es.uniovi.search.analyzer.NombreViaAnalyzer;
 
 @Entity
@@ -167,6 +168,11 @@ public class Via implements Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return this.sector.pathLog() + "/vias/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return ViaDto.class;
 	}
 
 }

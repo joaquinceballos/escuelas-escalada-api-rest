@@ -25,6 +25,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.EscuelaDto;
 import es.uniovi.search.analyzer.ApiAnalyzer;
 import es.uniovi.search.analyzer.NombreEscuelaAnalyzer;
 import es.uniovi.validation.Coordenadas;
@@ -177,6 +178,11 @@ public class Escuela implements Ubicable, Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return "/escuelas/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return EscuelaDto.class;
 	}
 
 }

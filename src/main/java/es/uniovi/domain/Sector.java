@@ -30,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.SectorDto;
 import es.uniovi.search.analyzer.NombreSectorAnalyzer;
 import es.uniovi.validation.Coordenadas;
 
@@ -195,6 +196,11 @@ public class Sector implements Ubicable, Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return this.escuela.pathLog() + "/sectores/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return SectorDto.class;
 	}
 
 }

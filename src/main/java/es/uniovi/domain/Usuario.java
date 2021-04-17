@@ -19,6 +19,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Past;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.UsuarioDto;
 import es.uniovi.validation.PaisIso;
 
 @Entity
@@ -182,6 +183,11 @@ public class Usuario implements Serializable, RecursoLogeable {
 	@Override
 	public String pathLog() {
 		return "/usuarios/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return UsuarioDto.class;
 	}
 
 }
