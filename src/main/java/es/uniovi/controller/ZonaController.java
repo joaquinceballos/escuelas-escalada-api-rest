@@ -21,6 +21,7 @@ import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
 import es.uniovi.dto.ZonaDto;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.filtro.FiltroZonas;
 import es.uniovi.service.ZonaService;
@@ -37,7 +38,7 @@ public class ZonaController extends BaseController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ListaPaginada<ZonaDto>> getZonas(
 			@Valid FiltroZonas filtro,
-			Pageable pageable) {
+			Pageable pageable) throws NoAutorizadoException {
 		return new ApiResponse<>(pageZonasToDto(zonaService.getZonas(pageable, filtro)), ApiResponseStatus.SUCCESS);
 	}
 	
