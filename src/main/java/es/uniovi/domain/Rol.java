@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +33,7 @@ public class Rol implements Serializable {
 	@ManyToMany(mappedBy = "roles")
 	private List<Usuario> usuarios;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "rol_privilegio",
 	           joinColumns = @JoinColumn(name = "rol_id",
 	                                     referencedColumnName = "id",
