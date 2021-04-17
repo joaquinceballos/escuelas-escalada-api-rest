@@ -14,7 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(indexes = @Index(name = "IND_LOG_MODIFICACIONES_FECHA", columnList = "fecha"))
+@Table(indexes = {
+		@Index(name = "IND_LOG_MODIFICACIONES_FECHA", columnList = "fecha"),
+		@Index(name = "IND_LOG_MODIFICACIONES_ID_RECURSO", columnList = "id_recurso") })
 public class LogModificaciones implements Serializable {
 
 	private static final long serialVersionUID = -4342654337217740102L;
