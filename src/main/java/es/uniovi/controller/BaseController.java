@@ -41,6 +41,7 @@ import es.uniovi.domain.Ascension;
 import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
+import es.uniovi.domain.LogModificaciones;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Usuario;
@@ -50,6 +51,7 @@ import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
+import es.uniovi.dto.LogModificacionesDto;
 import es.uniovi.dto.SectorDto;
 import es.uniovi.dto.SectorRootDto;
 import es.uniovi.dto.TrazoViaDto;
@@ -391,6 +393,23 @@ public abstract class BaseController {
 	
 	protected Zona toEntity(ZonaDto zonaDto) {
 		return modelMapper.map(zonaDto, Zona.class);
+	}
+	
+	protected ListaPaginada<LogModificacionesDto> pageCambiosToDto(Page<LogModificaciones> paginaCambios){
+		ListaPaginada<LogModificacionesDto> listaPaginada = new ListaPaginada<>();
+		listaPaginada.setSize(paginaCambios.getSize());
+		listaPaginada.setPage(paginaCambios.getNumber());
+		listaPaginada.setContenido(toCambiosDto(paginaCambios.getContent()));
+		listaPaginada.setTotalPaginas(paginaCambios.getTotalPages());
+		return listaPaginada;
+	}
+
+	private List<LogModificacionesDto> toCambiosDto(List<LogModificaciones> cambios) {
+		return cambios.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
+	private LogModificacionesDto toDto(LogModificaciones cambio) {
+		return modelMapper.map(cambio, LogModificacionesDto.class);
 	}
 	
 }

@@ -29,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.SectorDto;
 import es.uniovi.search.analyzer.NombreSectorAnalyzer;
 import es.uniovi.validation.Coordenadas;
 
@@ -36,7 +38,7 @@ import es.uniovi.validation.Coordenadas;
 @Coordenadas
 @Indexed(index = "Sector")
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_SECTOR_NOMBRE_ESCUELA", columnNames = { "NOMBRE", "ESCUELA" }))
-public class Sector implements Ubicable, Serializable {
+public class Sector implements Ubicable, Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = 6121972409424227333L;
 
@@ -184,6 +186,21 @@ public class Sector implements Ubicable, Serializable {
 	public String toString() {
 		return "Sector [id=" + id + ", nombre=" + nombre + ", latitud=" + latitud + ", longitud=" + longitud
 				+ ", vias=" + vias + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.SECTOR;
+	}
+
+	@Override
+	public String pathLog() {
+		return this.escuela.pathLog() + "/sectores/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return SectorDto.class;
 	}
 
 }

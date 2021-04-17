@@ -15,11 +15,13 @@ import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.Formula;
 
+import es.uniovi.domain.LogModificaciones.TipoRecurso;
+import es.uniovi.dto.ZonaDto;
 import es.uniovi.validation.PaisIso;
 
 @Entity(name = "zona")
 @Table(uniqueConstraints = @UniqueConstraint(name = "UK_ZONA_PAIS_REGION", columnNames = { "PAIS", "REGION" }))
-public class Zona implements Serializable {
+public class Zona implements Serializable, RecursoLogeable {
 
 	private static final long serialVersionUID = -8029538604557495453L;
 
@@ -113,6 +115,21 @@ public class Zona implements Serializable {
 	public String toString() {
 		return "Zona [id=" + id + ", pais=" + pais + ", region=" + region + ", numeroEscuelas=" + numeroEscuelas
 				+ ", numeroVias=" + numeroVias + "]";
+	}
+
+	@Override
+	public TipoRecurso getTipo() {
+		return TipoRecurso.ZONA;
+	}
+
+	@Override
+	public String pathLog() {
+		return "/zonas/" + this.id;
+	}
+
+	@Override
+	public Class<?> claseSerializar() {
+		return ZonaDto.class;
 	}
 
 }
