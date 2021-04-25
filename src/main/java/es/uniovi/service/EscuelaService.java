@@ -13,6 +13,7 @@ import es.uniovi.domain.Escuela;
 import es.uniovi.domain.Sector;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.ServiceException;
 
@@ -25,9 +26,13 @@ public interface EscuelaService {
 	 * @param size   El tamaño de la página
 	 * @param idZona La zona por la que filtrar los resultados
 	 * @return La página de resultados
-	 * @throws NoEncontradoException 
+	 * @throws NoEncontradoException No se encuentra la zona
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Page<Escuela> getEscuelas(Integer page, Integer size, Long idZona) throws NoEncontradoException;
+	Page<Escuela> getEscuelas(
+			Integer page,
+			Integer size,
+			Long idZona) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Obtiene la Escuela cuyo id es pasado
@@ -35,8 +40,9 @@ public interface EscuelaService {
 	 * @param id La id
 	 * @return La Escuela buscada
 	 * @throws NoEncontradoException Si no se han encontrado resultados
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Escuela getEscuela(Long id) throws NoEncontradoException;
+	Escuela getEscuela(Long id) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Persiste una nueva escuela y todos los sectores que contenga
@@ -53,8 +59,9 @@ public interface EscuelaService {
 	 * @param id La id de la escuela
 	 * @return La lista de sectores, si no hay ninguno una lista vacía
 	 * @throws NoEncontradoException Si no existe escuela con la id pasada
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Set<Sector> getSectores(Long id) throws NoEncontradoException;
+	Set<Sector> getSectores(Long id) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Obtiene el sector cuya id es pasada
@@ -64,8 +71,9 @@ public interface EscuelaService {
 	 * @return El sector
 	 * @throws NoEncontradoException Si la id de escuela no existe o si el id de
 	 *                               sector no pertenece a la escuela pasada
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException;
+	Sector getSector(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Persiste un nuevo sector asociado a la escuela cuya id es pasada.
@@ -83,9 +91,10 @@ public interface EscuelaService {
 	 * @param idEscuela La id de la escuela
 	 * @param idSector  La id del sector
 	 * @return La lista de las vías del sector
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 * @throws ServiceException
 	 */
-	Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException;
+	Set<Via> getVias(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Obtiene la vía cuya id es pasada
@@ -95,8 +104,9 @@ public interface EscuelaService {
 	 * @param idVia     La id de la vía
 	 * @return La vía
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
+	Via getVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Persiste la escuela pasada
@@ -123,8 +133,9 @@ public interface EscuelaService {
 	 * Borra la escuela cuya id es pasada
 	 * 
 	 * @param id La id de la escuela a Borrar
+	 * @throws NoAutorizadoException 
 	 */
-	void deleteEscuela(Long id) throws NoEncontradoException;
+	void deleteEscuela(Long id) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Borra el sector cuya id es pasada
@@ -132,8 +143,9 @@ public interface EscuelaService {
 	 * @param idEscuela La id de la escuela
 	 * @param idSector  La id del sector
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
-	void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException;
+	void deleteSector(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Borra la vía cuya id es pasada
@@ -142,8 +154,9 @@ public interface EscuelaService {
 	 * @param idSector  La id del sector
 	 * @param idVia     La id de la vía
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
-	void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException;
+	void deleteVia(Long idEscuela, Long idSector, Long idVia) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Actualiza todos los campos simples de la escuela cuyo id es pasado
@@ -152,8 +165,9 @@ public interface EscuelaService {
 	 * @param escuela La escuela
 	 * @return La escuela actualizada
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
-	Escuela actualizaEscuela(Long id, Escuela escuela) throws NoEncontradoException;
+	Escuela actualizaEscuela(Long id, Escuela escuela) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Actualiza todos los campos simples del sector cuyo id es pasado
@@ -163,8 +177,9 @@ public interface EscuelaService {
 	 * @param sector    El sector con los datos a actualizar
 	 * @return El sector actualizado
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
-	Sector actualizaSector(Long idEscuela, Long idSector, Sector sector) throws NoEncontradoException;
+	Sector actualizaSector(Long idEscuela, Long idSector, Sector sector) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Actualiza todos los campos simples de la escuela pasada
@@ -175,8 +190,9 @@ public interface EscuelaService {
 	 * @param via       La vía con los campos a actualizar
 	 * @return La vía actualizada
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
-	Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via) throws NoEncontradoException;
+	Via actualizaVia(Long idEscuela, Long idSector, Long idVia, Via via) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Obtiene los croquis del sector pasado
@@ -185,8 +201,9 @@ public interface EscuelaService {
 	 * @param idSector  La id del sector
 	 * @return La lista de croquis del sector
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException;
+	List<Croquis> getCroquis(Long idEscuela, Long idSector) throws NoEncontradoException, NoAutorizadoException;
 	
 	/**
 	 * Obtiene el croquis pasado
@@ -196,8 +213,9 @@ public interface EscuelaService {
 	 * @param idCroquis El id del croquis
 	 * @return El croquis
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException Usuario sin permisos suficientes
 	 */
-	Croquis getCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException;
+	Croquis getCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Añade nuevo Croquis al sector
@@ -216,8 +234,9 @@ public interface EscuelaService {
 	 * @param idEscuela El id de las escuela
 	 * @param idSector  El id del sector
 	 * @param idCroquis El id el croquis
+	 * @throws NoAutorizadoException 
 	 */
-	void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException;
+	void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Añade nuevo trazo de vía al croquis
@@ -247,13 +266,14 @@ public interface EscuelaService {
 	 * @param trazoVia  El trazo de vía
 	 * @return El trazo actualizado
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
 	TrazoVia updateTrazoVia(
 			Long idEscuela,
 			Long idSector,
 			Long idCroquis,
 			Long idVia,
-			TrazoVia trazoVia) throws NoEncontradoException;
+			TrazoVia trazoVia) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Borra el trazo de vía cuya id es pasada
@@ -263,12 +283,13 @@ public interface EscuelaService {
 	 * @param idCroquis El id del croquis
 	 * @param idVia El id de la vía
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException 
 	 */
 	void deleteTrazoVia(
 			Long idEscuela,
 			Long idSector,
 			Long idCroquis,
-			Long idVia) throws NoEncontradoException;
+			Long idVia) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Persiste nuevo cierre de temporada para la escuela pasada

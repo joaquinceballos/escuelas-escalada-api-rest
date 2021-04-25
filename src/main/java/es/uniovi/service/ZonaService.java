@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import es.uniovi.domain.Zona;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
@@ -17,8 +18,9 @@ public interface ZonaService {
 	 * @param pageable Los parámetros de paginación
 	 * @param filtro   El filtro
 	 * @return La página de resultados
+	 * @throws NoAutorizadoException Usuario sin privilegios suficientes
 	 */
-	Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro);
+	Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) throws NoAutorizadoException;
 
 	/**
 	 * Persiste una nueva Zona
@@ -26,8 +28,9 @@ public interface ZonaService {
 	 * @param zona La zona
 	 * @return La zona persistida
 	 * @throws RestriccionDatosException
+	 * @throws NoAutorizadoException Usuario sin privilegios suficientes
 	 */
-	Zona addZona(Zona zona) throws RestriccionDatosException;
+	Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException;
 
 	/**
 	 * Obtiene la zona cuya id es pasada
@@ -35,8 +38,9 @@ public interface ZonaService {
 	 * @param id La id
 	 * @return La zona
 	 * @throws NoEncontradoException
+	 * @throws NoAutorizadoException Usuario sin privilegios suficientes
 	 */
-	Zona getZona(Long id) throws NoEncontradoException;
+	Zona getZona(Long id) throws NoEncontradoException, NoAutorizadoException;
 
 	/**
 	 * Actualiza la zona pasada

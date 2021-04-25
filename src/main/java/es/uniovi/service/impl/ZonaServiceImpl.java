@@ -9,14 +9,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import es.uniovi.domain.LogModificaciones.AccionLog;
+import es.uniovi.domain.NombrePrivilegio;
 import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Zona;
+import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.filtro.FiltroZonas;
 import es.uniovi.repository.ZonaRepository;
 import es.uniovi.service.LogModificacionesService;
+import es.uniovi.service.PrivilegioService;
 import es.uniovi.service.ZonaService;
 
 @Service
@@ -29,9 +32,13 @@ public class ZonaServiceImpl implements ZonaService {
 	
 	@Autowired
 	private LogModificacionesService logModificacionesService;
+	
+	@Autowired
+	private PrivilegioService privilegioService;
 
 	@Override
-	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) {
+	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) throws NoAutorizadoException {
+		checkPrivilegioLectura();
 		if (filtro.getPais() != null) {
 			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
 				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThan(filtro.getPais(), 0, pageable);
@@ -48,7 +55,8 @@ public class ZonaServiceImpl implements ZonaService {
 	}
 
 	@Override
-	public Zona addZona(Zona zona) throws RestriccionDatosException {
+	public Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException {
+		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
 			throw new RestriccionDatosException("Zona ya existe");
 		}
@@ -58,7 +66,8 @@ public class ZonaServiceImpl implements ZonaService {
 	}
 
 	@Override
-	public Zona getZona(Long id) throws NoEncontradoException {
+	public Zona getZona(Long id) throws NoEncontradoException, NoAutorizadoException {
+		checkPrivilegioLectura();
 		return doGetZona(id);
 	}
 
@@ -68,6 +77,7 @@ public class ZonaServiceImpl implements ZonaService {
 
 	@Override
 	public Zona actualizaZona(Long id, Zona zona) throws ServiceException {
+		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
 			throw new RestriccionDatosException("Zona ya existe");
 		}
@@ -80,6 +90,7 @@ public class ZonaServiceImpl implements ZonaService {
 
 	@Override
 	public void deleteZona(Long id) throws ServiceException {
+		checkPrivilegioBorrado();
 		Zona zona = doGetZona(id);
 		if (zonaRepository.countEscuelasById(zona.getId()) > 0) {
 			throw new RestriccionDatosException("No es posible borrar la zona");
@@ -102,6 +113,24 @@ public class ZonaServiceImpl implements ZonaService {
 		} catch (DataAccessException e) {
 			logger.error("Error persistiendo Log modificaciones: {}", e.getMessage());
 			logger.debug(e);
+		}
+	}
+
+	private void checkPrivilegioLectura() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.LECTURA);
+	}
+
+	private void checkPrivilegioEscritura() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.ESCRITURA_ZONA);
+	}
+
+	private void checkPrivilegioBorrado() throws NoAutorizadoException {
+		checkPrivilegio(NombrePrivilegio.BORRADO_ZONA);
+	}
+
+	private void checkPrivilegio(NombrePrivilegio nombre) throws NoAutorizadoException {
+		if (Boolean.FALSE.equals(privilegioService.checkPrivilegio(nombre))) {
+			throw new NoAutorizadoException("Usuario sin privilegios de " + nombre);
 		}
 	}
 

@@ -17,8 +17,7 @@ public interface LogModificacionesRepository extends PagingAndSortingRepository<
 			"from logModificaciones m " +
 			"where m.tipoRecurso in :tipos " +
 			"and (:idRecurso is null or m.idRecurso = :idRecurso) " +
-			"and (:idUsuario is null or m.usuario.id = :idUsuario) " +
-			"order by fecha desc")
+			"and (:idUsuario is null or m.usuario.id = :idUsuario) ")
 	Page<LogModificaciones> findModificacionesPublicas(
 			EnumSet<TipoRecurso> tipos,
 			Long idRecurso,
