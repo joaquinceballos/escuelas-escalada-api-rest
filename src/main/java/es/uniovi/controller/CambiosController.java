@@ -31,7 +31,7 @@ public class CambiosController extends BaseController {
 	public ApiResponse<ListaPaginada<LogModificacionesDto>> getZonas(
 			@Valid FiltroCambios filtro,
 			Pageable pageable) {
-		return new ApiResponse<>(pageCambiosToDto(modificacionesService.getUltimosCambios(pageable, filtro)), ApiResponseStatus.SUCCESS);
+		return new ApiResponse<>(pageCambiosToDto(modificacionesService.getCambiosPublicos(pageable, filtro)), ApiResponseStatus.SUCCESS);
 	}
 
 }

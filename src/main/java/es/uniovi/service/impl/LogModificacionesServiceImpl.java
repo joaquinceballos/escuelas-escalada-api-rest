@@ -59,7 +59,7 @@ public class LogModificacionesServiceImpl implements LogModificacionesService {
 	}
 
 	@Override
-	public Page<LogModificaciones> getUltimosCambios(Pageable pageable, FiltroCambios filtro) {
+	public Page<LogModificaciones> getCambiosPublicos(Pageable pageable, FiltroCambios filtro) {
 		EnumSet<TipoRecurso> tipos = EnumSet.of(
 				TipoRecurso.ESCUELA,
 				TipoRecurso.ASCENSION,

@@ -31,12 +31,12 @@ public interface LogModificacionesService {
 	void logBorrar(RecursoLogeable recursoLogeable);
 
 	/**
-	 * Retorna los últimos cambios públicos en los datos
+	 * Retorna los cambios públicos en los datos
 	 * 
 	 * @param pageable Parámetros de paginación
 	 * @param filtro   El filtro
 	 * @return La página de resultados
 	 */
-	Page<LogModificaciones> getUltimosCambios(Pageable pageable, FiltroCambios filtro);
+	Page<LogModificaciones> getCambiosPublicos(Pageable pageable, FiltroCambios filtro);
 
 }
