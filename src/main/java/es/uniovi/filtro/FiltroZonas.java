@@ -8,8 +8,6 @@ public class FiltroZonas {
 	private String pais;
 
 	private Boolean conEscuelas;
-	
-	private Boolean visible;
 
 	public FiltroZonas() {
 		super();
@@ -29,14 +27,6 @@ public class FiltroZonas {
 
 	public void setConEscuelas(Boolean conEscuelas) {
 		this.conEscuelas = conEscuelas;
-	}
-
-	public Boolean getVisible() {
-		return visible;
-	}
-
-	public void setVisible(Boolean visible) {
-		this.visible = visible;
 	}
 
 }
