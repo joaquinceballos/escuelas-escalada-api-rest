@@ -42,6 +42,12 @@ public class ZonaController extends BaseController {
 		return new ApiResponse<>(pageZonasToDto(zonaService.getZonas(pageable, filtro)), ApiResponseStatus.SUCCESS);
 	}
 	
+	@GetMapping("/todas")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ListaPaginada<ZonaDto>> getTodasZonas(Pageable pageable) {
+		return new ApiResponse<>(pageZonasToDto(zonaService.getTodasLasZonas(pageable)), ApiResponseStatus.SUCCESS);
+	}
+	
 	@GetMapping("/{id}")
 	@ResponseStatus(code = HttpStatus.OK)
 	public ApiResponse<ZonaDto> getZona(@PathVariable(name = "id") @NotNull Long id) throws ServiceException {

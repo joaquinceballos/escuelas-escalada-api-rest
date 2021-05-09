@@ -41,17 +41,22 @@ public class ZonaServiceImpl implements ZonaService {
 		checkPrivilegioLectura();
 		if (filtro.getPais() != null) {
 			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
-				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThan(filtro.getPais(), 0, pageable);
+				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThanAndVisibleTrue(filtro.getPais(), 0, pageable);
 			} else {
-				return zonaRepository.findAllByPais(filtro.getPais(), pageable);
+				return zonaRepository.findAllByPaisAndVisibleTrue(filtro.getPais(), pageable);
 			}
 		} else {
 			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
-				return zonaRepository.findByNumeroEscuelasGreaterThan(0, pageable);
+				return zonaRepository.findByNumeroEscuelasGreaterThanAndVisibleTrue(0, pageable);
 			} else {
-				return zonaRepository.findAll(pageable);
+				return zonaRepository.findAllByVisibleTrue(pageable);
 			}
 		}
+	}
+
+	@Override
+	public Page<Zona> getTodasLasZonas(Pageable pageable) {
+		return zonaRepository.findAll(pageable);
 	}
 
 	@Override
