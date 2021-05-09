@@ -47,6 +47,8 @@ public class Zona implements Serializable, RecursoLogeable {
 			 " where e.zona = id)")
 	private Integer numeroVias;
 	
+	private Boolean visible;
+	
 	@OrderBy("nombre")
 	@OneToMany(mappedBy = "zona")
 	private Set<Escuela> escuelas = new HashSet<>();
@@ -109,6 +111,14 @@ public class Zona implements Serializable, RecursoLogeable {
 
 	public void setEscuelas(Set<Escuela> escuelas) {
 		this.escuelas = escuelas;
+	}
+
+	public Boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(Boolean visible) {
+		this.visible = visible;
 	}
 
 	@Override
