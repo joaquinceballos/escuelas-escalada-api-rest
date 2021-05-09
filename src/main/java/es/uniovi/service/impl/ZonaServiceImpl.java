@@ -55,6 +55,11 @@ public class ZonaServiceImpl implements ZonaService {
 	}
 
 	@Override
+	public Page<Zona> getTodasLasZonas(Pageable pageable) {
+		return zonaRepository.findAll(pageable);
+	}
+
+	@Override
 	public Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException {
 		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
