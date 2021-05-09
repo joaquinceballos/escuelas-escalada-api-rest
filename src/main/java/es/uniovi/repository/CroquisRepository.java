@@ -11,4 +11,6 @@ public interface CroquisRepository extends CrudRepository<Croquis, Long> {
 
 	List<Croquis> findBySector(Sector sector);
 
+	boolean existsBySectorAndNombre(Sector sector, String nombre);
+
 }

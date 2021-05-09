@@ -4,16 +4,19 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import es.uniovi.common.Converter;
 import es.uniovi.exception.ImagenNoValidaException;
 import es.uniovi.service.ImagenService;
 
 @Service
 public class ImagenServiceImpl implements ImagenService {
+	
+    private static final Logger logger = LogManager.getLogger(ImagenServiceImpl.class);
 	
 	@Value("${imagen.tipos-validos}")
 	private List<String> tiposImagenValidos;
@@ -26,7 +29,9 @@ public class ImagenServiceImpl implements ImagenService {
 		try {
 			return Base64.getDecoder().decode(base64);
 		} catch (IllegalArgumentException e) {
-			throw new ImagenNoValidaException(e.getLocalizedMessage());
+			logger.error(e.getMessage());
+			logger.debug(e);
+			throw new ImagenNoValidaException();
 		}
 	}
 
@@ -37,9 +42,7 @@ public class ImagenServiceImpl implements ImagenService {
 
 	private void checkTamano(byte[] bytes) throws ImagenNoValidaException {
 		if (bytes.length > maxTamano) {
-			throw new ImagenNoValidaException(
-					"Tamaño máximo de imagen superado, máx: "+ Converter.getSize(maxTamano)
-							+ ", actual: " + Converter.getSize(bytes.length));
+			throw new ImagenNoValidaException();
 		}
 	}
 
@@ -48,7 +51,7 @@ public class ImagenServiceImpl implements ImagenService {
 		byte[] primerosBytes = Arrays.copyOf(bytes, Math.min(n, 2000));
 		String tipo = new Tika().detect(primerosBytes);
 		if(!tiposImagenValidos.contains(tipo)) {
-			throw new ImagenNoValidaException("Formato de imagen no aceptado: " + tipo);
+			throw new ImagenNoValidaException();
 		}
 		return tipo;
 	}

@@ -25,6 +25,7 @@ import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
+import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.repository.AscensionRepository;
@@ -64,32 +65,34 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public Usuario addUsuario(Usuario usuario) throws RestriccionDatosException {
-		try {
-			codificaPassword(usuario);
-			Rol rolUser = rolRepository
-					.findByNombre(NombreRol.valueOf("USER"))
-					.orElseThrow(() -> new NoSuchElementException("rol USER"));
-			usuario.setRoles(Arrays.asList(rolUser));
-			Usuario savedUsuario = usuarioRepository.save(usuario);
-			logModificaciones(savedUsuario, AccionLog.CREAR);
-			return savedUsuario;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		checkRestriccionesUnicas(usuario);
+		codificaPassword(usuario);
+		Rol rolUser = rolRepository.findByNombre(NombreRol.valueOf("USER"))
+				.orElseThrow(() -> new NoSuchElementException("rol USER"));
+		usuario.setRoles(Arrays.asList(rolUser));
+		Usuario savedUsuario = usuarioRepository.save(usuario);
+		logModificaciones(savedUsuario, AccionLog.CREAR);
+		return savedUsuario;
+	}
+
+	private void checkRestriccionesUnicas(Usuario usuario) throws RecursoYaExisteException {
+		if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+			throw new RecursoYaExisteException(usuario.getEmail());
+		}
+		if (usuarioRepository.existsByUsername(usuario.getUsername())) {
+			throw new RecursoYaExisteException(usuario.getUsername());
 		}
 	}
 
 	@Override
 	public Usuario updateUsuario(Usuario usuario) throws ServiceException {
-		try {
-			if (!usuarioRepository.existsById(usuario.getId())) {
-				throw new NoEncontradoException("usuario.id", usuario.getId());
-			}
-			codificaPassword(usuario);
-			logModificaciones(usuario, AccionLog.ACTUALIZAR);
-			return usuarioRepository.save(usuario);
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		if (!usuarioRepository.existsById(usuario.getId())) {
+			throw new NoEncontradoException("usuario.id", usuario.getId());
 		}
+		checkRestriccionesUnicas(usuario);
+		codificaPassword(usuario);
+		logModificaciones(usuario, AccionLog.ACTUALIZAR);
+		return usuarioRepository.save(usuario);
 	}
 
 	@Override

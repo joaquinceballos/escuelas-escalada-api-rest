@@ -44,6 +44,7 @@ import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
+import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.repository.CierreTemporadaRepository;
@@ -125,29 +126,25 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
-	public Escuela addEscuela(Escuela escuela) throws RestriccionDatosException, NoAutorizadoException {
+	public Escuela addEscuela(Escuela escuela)
+			throws RestriccionDatosException, NoAutorizadoException, NoEncontradoException {
 		checkPrivilegioEscritura();
-		if(escuelaRepository.existsByNombre(escuela.getNombre())) {
-			throw new RestriccionDatosException("Escuela ya existe");
+		if (escuelaRepository.existsByNombre(escuela.getNombre())) {
+			throw new RecursoYaExisteException(escuela.getNombre());
 		}
-		try {
-			escuela.setId(null);
-			for (Sector sector : escuela.getSectores()) {
-				asociaNuevoSector(escuela, sector);
-			}
-			for (CierreTemporada cierreTemporada : escuela.getCierresTemporada()) {
-				asociaNuevoCierre(escuela, cierreTemporada);
-			}
-			if (escuela.getZona() != null
-					&& Boolean.FALSE.equals(zonaRepository.existsById(escuela.getZona().getId()))) {
-				throw new RestriccionDatosException("Zona no existe: " + escuela.getZona().getId());
-			}
-			Escuela savedEscuela = doSaveEscuela(escuela);
-			logModificaciones(savedEscuela, AccionLog.CREAR);
-			return savedEscuela;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		escuela.setId(null);
+		for (Sector sector : escuela.getSectores()) {
+			asociaNuevoSector(escuela, sector);
 		}
+		for (CierreTemporada cierreTemporada : escuela.getCierresTemporada()) {
+			asociaNuevoCierre(escuela, cierreTemporada);
+		}
+		if (escuela.getZona() != null && Boolean.FALSE.equals(zonaRepository.existsById(escuela.getZona().getId()))) {
+			throw new NoEncontradoException("zona", escuela.getZona().getId());
+		}
+		Escuela savedEscuela = doSaveEscuela(escuela);
+		logModificaciones(savedEscuela, AccionLog.CREAR);
+		return savedEscuela;
 	}
 
 	/**
@@ -205,18 +202,13 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Transactional
 	public Sector addSector(Long idEscuela, Sector sector) throws ServiceException {
 		checkPrivilegioEscritura();
-		try {
-			asociaNuevoSector(doGetEscuela(idEscuela), sector);
-			if (sectorRepository.existsByEscuelaAndNombre(sector.getEscuela(), sector.getNombre())) {
-				throw new RestriccionDatosException(
-						String.format("Nombre de sector ya existe en la escuela %s", sector.getEscuela().getId()));
-			}
-			doSaveSector(sector);
-			logModificaciones(sector, AccionLog.CREAR);
-			return sector;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		asociaNuevoSector(doGetEscuela(idEscuela), sector);
+		if (sectorRepository.existsByEscuelaAndNombre(sector.getEscuela(), sector.getNombre())) {
+			throw new RecursoYaExisteException(sector.getEscuela().getNombre() + "/" + sector.getNombre());
 		}
+		doSaveSector(sector);
+		logModificaciones(sector, AccionLog.CREAR);
+		return sector;
 	}
 
 	/**
@@ -266,15 +258,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 	@Override
 	public Via addVia(Long idEscuela, Long idSector, Via via) throws ServiceException {
 		checkPrivilegioEscritura();
-		try {
-			Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
-			asociaSectorVia(sector, via);
-			Via savedVia = viaRepository.save(via);
-			logModificaciones(savedVia, AccionLog.CREAR);
-			return savedVia;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+		if (viaRepository.existsBySectorAndNombre(sector, via.getNombre())) {
+			throw new RecursoYaExisteException(sector.getNombre() + "/" + via.getNombre());
 		}
+		asociaSectorVia(sector, via);
+		Via savedVia = viaRepository.save(via);
+		logModificaciones(savedVia, AccionLog.CREAR);
+		return savedVia;
 	}
 
 	private Escuela doGetEscuela(Long id) throws NoEncontradoException {
@@ -323,9 +314,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 			return doActualizaEscuela(escuelaPatched);
 		} catch (JsonPatchException | JsonProcessingException e) {
 			throw new PatchInvalidoException(e.getLocalizedMessage());
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
-		} 
+		}
 	}
 
 	private Escuela doActualizaEscuela(Escuela escuela) {
@@ -419,7 +408,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 	private void checkNombreExiste(Escuela escuela, Escuela escuelaPatched) throws RestriccionDatosException {
 		if (!escuela.getNombre().equals(escuelaPatched.getNombre())
 				&& escuelaRepository.existsByNombre(escuelaPatched.getNombre())) {
-			throw new RestriccionDatosException("nombre: " + escuelaPatched.getNombre() + " ya existe");
+			throw new RecursoYaExisteException(escuelaPatched.getNombre());
 		}
 	}
 
@@ -547,13 +536,12 @@ public class EscuelaServiceImpl implements EscuelaService {
 		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
 		croquis.setSector(sector);
 		imagenService.checkImagen(croquis.getImagen());
-		try {
-			Croquis savedCroquis = croquisRepository.save(croquis);
-			logModificaciones(savedCroquis, AccionLog.CREAR);
-			return savedCroquis;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
+		if (croquisRepository.existsBySectorAndNombre(sector, croquis.getNombre())) {
+			throw new RecursoYaExisteException(sector.getNombre() + "/" + croquis.getNombre());
 		}
+		Croquis savedCroquis = croquisRepository.save(croquis);
+		logModificaciones(savedCroquis, AccionLog.CREAR);
+		return savedCroquis;
 	}
 
 	@Override
@@ -589,15 +577,11 @@ public class EscuelaServiceImpl implements EscuelaService {
 		trazoVia.setCroquis(croquis);
 		trazoVia.setVia(via);
 		if (trazoViaRepository.existsByCroquisAndVia(croquis, via)) {
-			throw new RestriccionDatosException("ya existe el trazo para croquis/via: " + idCroquis + "/" + idVia);
+			throw new RecursoYaExisteException(idCroquis + "/" + idVia);
 		}
-		try {
-			TrazoVia savedTrazoVia = trazoViaRepository.save(trazoVia);
-			logModificaciones(savedTrazoVia, AccionLog.CREAR);
-			return savedTrazoVia;
-		} catch (DataIntegrityViolationException e) {
-			throw new RestriccionDatosException(e.getMostSpecificCause().getMessage());
-		}
+		TrazoVia savedTrazoVia = trazoViaRepository.save(trazoVia);
+		logModificaciones(savedTrazoVia, AccionLog.CREAR);
+		return savedTrazoVia;
 	}
 
 	private Croquis doGetCroquisSector(Long idCroquis, Sector sector) throws NoEncontradoException {

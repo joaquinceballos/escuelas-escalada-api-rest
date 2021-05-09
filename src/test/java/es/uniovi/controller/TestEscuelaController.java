@@ -25,6 +25,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +55,9 @@ class TestEscuelaController {
 
 	@Mock
 	private EscuelaService escuelaService;
+	
+	@Mock
+	private MessageSource messageSource;
 
 	@InjectMocks
 	private EscuelaController escuelaController;
@@ -65,6 +69,12 @@ class TestEscuelaController {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(escuelaController).build();
 		ReflectionTestUtils.setField(escuelaController, "modelMapper", new ModelMapper());
+		Mockito
+			.when(messageSource.getMessage(
+				ArgumentMatchers.anyString(),
+				ArgumentMatchers.any(Object[].class),
+				ArgumentMatchers.any()))
+			.thenReturn("mensaje");
 	}
 
 	/**

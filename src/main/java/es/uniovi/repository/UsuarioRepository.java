@@ -34,4 +34,20 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 	 */
 	Optional<Usuario> findByUsername(String username);
 
+	/**
+	 * Comprueba si ya existe un usuario con el email pasado
+	 * 
+	 * @param email El email
+	 * @return True, si existe
+	 */
+	boolean existsByEmail(String email);
+
+	/**
+	 * Compruba si ya existe un usuario con el nombre de usuario pasado
+	 * 
+	 * @param username El nombre de usuario
+	 * @return True, si existe
+	 */
+	boolean existsByUsername(String username);
+
 }

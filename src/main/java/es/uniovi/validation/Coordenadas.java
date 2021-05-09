@@ -17,7 +17,7 @@ import es.uniovi.validation.validators.CoordenadasValidator;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CoordenadasValidator.class)
 public @interface Coordenadas {
-	String message() default "Coordenadas pasadas no son correctas";
+	String message() default "{error.coordenadas}";
 
 	Class<?>[] groups() default {};
 

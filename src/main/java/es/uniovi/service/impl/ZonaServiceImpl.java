@@ -14,6 +14,7 @@ import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
+import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.filtro.FiltroZonas;
@@ -58,7 +59,7 @@ public class ZonaServiceImpl implements ZonaService {
 	public Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException {
 		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
-			throw new RestriccionDatosException("Zona ya existe");
+			throw new RecursoYaExisteException(zona.getPais() + "/" + zona.getRegion());
 		}
 		Zona savedZona = zonaRepository.save(zona);
 		logModificaciones(zona, AccionLog.CREAR);
@@ -79,7 +80,7 @@ public class ZonaServiceImpl implements ZonaService {
 	public Zona actualizaZona(Long id, Zona zona) throws ServiceException {
 		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
-			throw new RestriccionDatosException("Zona ya existe");
+			throw new RecursoYaExisteException(zona.getPais() + "/" + zona.getRegion());
 		}
 		Zona persistida = doGetZona(id);
 		persistida.setPais(zona.getPais());
