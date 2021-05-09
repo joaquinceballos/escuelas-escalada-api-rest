@@ -23,12 +23,19 @@ public interface ZonaService {
 	Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) throws NoAutorizadoException;
 
 	/**
+	 * Obtiene la página de zonas para los parámetros pasados
+	 * 
+	 * @return La página de resultados
+	 */
+	Page<Zona> getTodasLasZonas(Pageable pageable);
+
+	/**
 	 * Persiste una nueva Zona
 	 * 
 	 * @param zona La zona
 	 * @return La zona persistida
 	 * @throws RestriccionDatosException
-	 * @throws NoAutorizadoException Usuario sin privilegios suficientes
+	 * @throws NoAutorizadoException     Usuario sin privilegios suficientes
 	 */
 	Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException;
 

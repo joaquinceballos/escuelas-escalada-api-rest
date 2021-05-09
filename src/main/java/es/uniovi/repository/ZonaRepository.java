@@ -28,31 +28,43 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 	Integer countEscuelasById(Long id);
 
 	/**
-	 * Recupera las zonas filtrando por país
+	 * Recupera las zonas visibles filtrando por país
 	 * 
 	 * @param pageable Parámetros de paginación
 	 * @param pais     El país
 	 * @return Las zonas
 	 */
-	Page<Zona> findAllByPais(String pais, Pageable pageable);
+	Page<Zona> findAllByPaisAndVisibleTrue(String pais, Pageable pageable);
 
 	/**
-	 * Recupera las zonas filtrando por país y número de escuelas mayor al pasado
+	 * Recupera las zonas visibles filtrando por país y número de escuelas mayor al
+	 * pasado
 	 * 
 	 * @param pageable       Parámetros de paginación
 	 * @param numeroEscuelas El número de escuelas (normalmente 0)
 	 * @param pais           El país
 	 * @return Las zonas
 	 */
-	Page<Zona> findAllByPaisAndNumeroEscuelasGreaterThan(String pais, Integer numeroEscuelas, Pageable pageable);
+	Page<Zona> findAllByPaisAndNumeroEscuelasGreaterThanAndVisibleTrue(
+			String pais,
+			Integer numeroEscuelas,
+			Pageable pageable);
 
 	/**
-	 * Recupera las zona filtrando por número de escuelas mayor al pasado
+	 * Recupera las zonas visibles filtrando por número de escuelas mayor al pasado
 	 * 
 	 * @param numeroEscuelas El número de escuelas (normalmente 0)
 	 * @param pageable       Parámetros de paginación
 	 * @return Las zonas
 	 */
-	Page<Zona> findByNumeroEscuelasGreaterThan(Integer numeroEscuelas, Pageable pageable);
+	Page<Zona> findByNumeroEscuelasGreaterThanAndVisibleTrue(Integer numeroEscuelas, Pageable pageable);
+
+	/**
+	 * Recupera las zonas visibles
+	 * 
+	 * @param pageable Parámetros de paginación
+	 * @return Las zonas
+	 */
+	Page<Zona> findAllByVisibleTrue(Pageable pageable);
 
 }
