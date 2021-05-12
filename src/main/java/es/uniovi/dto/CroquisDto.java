@@ -23,6 +23,8 @@ public class CroquisDto {
 	private String nombre;
 	
 	private String formatoImagen;
+	
+	private String tipoLeyenda;
 
 	public CroquisDto() {
 		super();
@@ -70,6 +72,14 @@ public class CroquisDto {
 
 	public void setFormatoImagen(String formatoImagen) {
 		this.formatoImagen = formatoImagen;
+	}
+
+	public String getTipoLeyenda() {
+		return tipoLeyenda;
+	}
+
+	public void setTipoLeyenda(String tipoLeyenda) {
+		this.tipoLeyenda = tipoLeyenda;
 	}
 
 	@Override

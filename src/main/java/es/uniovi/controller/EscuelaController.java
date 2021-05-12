@@ -8,6 +8,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +29,12 @@ import com.github.fge.jsonpatch.JsonPatch;
 import es.uniovi.api.ApiResponse;
 import es.uniovi.api.ApiResponseStatus;
 import es.uniovi.api.ListaPaginada;
+import es.uniovi.domain.Ascension;
 import es.uniovi.domain.Croquis;
+import es.uniovi.domain.TipoLeyenda;
 import es.uniovi.domain.TrazoVia;
 import es.uniovi.domain.Via;
+import es.uniovi.dto.AscensionDto;
 import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
@@ -39,6 +44,7 @@ import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.service.EscuelaService;
+import es.uniovi.validation.ValueOfEnum;
 
 @Validated
 @RestController
@@ -47,7 +53,7 @@ public class EscuelaController extends BaseController {
 
 	@Autowired
 	private EscuelaService escuelaService;
-
+	
 	/**
 	 * Retorna una lista paginada de escuelas
 	 * 
@@ -264,7 +270,26 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "idSector") @NotNull Long idSector,
 			@PathVariable(name = "idCroquis") @NotNull Long idCroquis) throws ServiceException {
 		escuelaService.deleteCroquis(idEscuela, idSector, idCroquis);
-		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
+	}
+	
+	@PutMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/leyenda")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<CroquisDto> updateTipoLeyenda(
+			@PathVariable(name = "idEscuela")
+			@NotNull
+			Long idEscuela,
+			@PathVariable(name = "idSector")
+			@NotNull
+			Long idSector,
+			@PathVariable(name = "idCroquis")
+			@NotNull
+			Long idCroquis,
+			@RequestParam(name = "tipoLeyenda", required = true)
+			@ValueOfEnum(enumClass = TipoLeyenda.class)
+			String tipoLeyenda) throws ServiceException {
+		escuelaService.actualizaTipoLeyenda(idEscuela, idSector, idCroquis, tipoLeyenda);
+		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);
 	}
 	
 	@PostMapping("/{idEscuela}/sectores/{idSector}/croquis/{idCroquis}/via/{idVia}")
@@ -398,6 +423,17 @@ public class EscuelaController extends BaseController {
 			@PathVariable(name = "idVia") @NotNull Long idVia) throws ServiceException {
 		escuelaService.deleteVia(idEscuela, idSector, idVia);
 		return new ApiResponse<>(null, ApiResponseStatus.SUCCESS);		
+	}
+	
+	@GetMapping("/{idEscuela}/sectores/{idSector}/vias/{idVia}/ascenciones")
+	@ResponseStatus(code = HttpStatus.OK)
+	public ApiResponse<ListaPaginada<AscensionDto>> getAscencionesVia(
+			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
+			@PathVariable(name = "idSector") @NotNull Long idSector,
+			@PathVariable(name = "idVia") @NotNull Long idVia,
+			Pageable pageable) throws ServiceException {
+		Page<Ascension> pageAscensiones = escuelaService.getAscencionesVia(idEscuela, idSector, idVia, pageable);
+		return new ApiResponse<>(pageAscensionToDto(pageAscensiones), ApiResponseStatus.SUCCESS);
 	}
 
 	/**
