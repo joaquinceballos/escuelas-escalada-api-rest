@@ -20,6 +20,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 
+import es.uniovi.domain.Ascension;
 import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
@@ -46,6 +48,7 @@ import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
+import es.uniovi.repository.AscensionRepository;
 import es.uniovi.repository.CierreTemporadaRepository;
 import es.uniovi.repository.CroquisRepository;
 import es.uniovi.repository.EscuelaRepository;
@@ -99,6 +102,9 @@ public class EscuelaServiceImpl implements EscuelaService {
 	
 	@Autowired
 	private PrivilegioService privilegioService;
+	
+	@Autowired
+	private AscensionRepository ascensionRepository;
 
 	@Override
 	public Page<Escuela> getEscuelas(
@@ -576,6 +582,25 @@ public class EscuelaServiceImpl implements EscuelaService {
 	}
 
 	@Override
+	public void actualizaTipoLeyenda(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			String tipoLeyenda) throws NoAutorizadoException, NoEncontradoException {
+		checkPrivilegioBorrado();
+		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+		Croquis croquis = sector
+				.getCroquis()
+				.stream()
+				.filter(c -> c.getId().equals(idCroquis)).findAny()
+				.orElseThrow(() -> new NoEncontradoException(
+						"escuela/sector/croquis",
+						idEscuela + "/" + idSector + "/" + idCroquis));
+		croquis.setTipoLeyenda(tipoLeyenda);
+		croquisRepository.save(croquis);
+	}
+
+	@Override
 	public TrazoVia addTrazoVia(
 			Long idEscuela,
 			Long idSector,
@@ -729,6 +754,18 @@ public class EscuelaServiceImpl implements EscuelaService {
 		if (Boolean.FALSE.equals(privilegioService.checkPrivilegio(nombre))) {
 			throw new NoAutorizadoException("Usuario sin privilegios de " + nombre);
 		}
+	}
+
+	@Override
+	public Page<Ascension> getAscencionesVia(Long idEscuela, Long idSector, Long idVia, Pageable pageable) throws NoEncontradoException {
+		Sector sector = doGetSectorDeEscuela(idSector, doGetEscuela(idEscuela));
+		Via via = sector
+				.getVias()
+				.stream()
+				.filter(v -> idVia.equals(v.getId()))
+				.findAny()
+				.orElseThrow(() -> new NoEncontradoException("sector", idVia));
+		return ascensionRepository.findByViaOrderByIdDesc(via, pageable);
 	}
 	
 }
