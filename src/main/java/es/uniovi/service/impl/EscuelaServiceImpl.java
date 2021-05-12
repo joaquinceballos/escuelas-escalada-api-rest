@@ -527,6 +527,7 @@ public class EscuelaServiceImpl implements EscuelaService {
 		via.setLongitud(via2.getLongitud());
 		via.setNombre(via2.getNombre());
 		via.setNumeroChapas(via2.getNumeroChapas());
+		via.setInformacion(via2.getInformacion());
 		logModificaciones(via, AccionLog.ACTUALIZAR);
 		return viaRepository.save(via);
 	}
