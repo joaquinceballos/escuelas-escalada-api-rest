@@ -2,6 +2,7 @@ package es.uniovi.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -23,6 +24,9 @@ public class ViaDto {
 	@Min(0)
 	@JsonInclude(Include.NON_NULL)
 	private Double longitud;
+	
+	@Size(max = 2000)
+	private String informacion;
 
 	public Long getId() {
 		return id;
@@ -62,6 +66,14 @@ public class ViaDto {
 
 	public void setLongitud(Double longitud) {
 		this.longitud = longitud;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
 	}
 
 	@Override

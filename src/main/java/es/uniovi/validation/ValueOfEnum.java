@@ -1,6 +1,7 @@
 package es.uniovi.validation;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -13,7 +14,7 @@ import javax.validation.Payload;
 import es.uniovi.validation.validators.ValueOfEnumValidator;
 
 @Documented
-@Target(FIELD)
+@Target({ PARAMETER, FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValueOfEnumValidator.class)
 public @interface ValueOfEnum {
