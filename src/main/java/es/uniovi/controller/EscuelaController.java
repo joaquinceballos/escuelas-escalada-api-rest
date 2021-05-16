@@ -39,6 +39,7 @@ import es.uniovi.dto.CierreTemporadaDto;
 import es.uniovi.dto.CroquisDto;
 import es.uniovi.dto.EscuelaDto;
 import es.uniovi.dto.SectorDto;
+import es.uniovi.dto.SectorRootDto;
 import es.uniovi.dto.TrazoViaDto;
 import es.uniovi.dto.ViaDto;
 import es.uniovi.exception.NoEncontradoException;
@@ -167,10 +168,10 @@ public class EscuelaController extends BaseController {
 	 */
 	@GetMapping("/{idEscuela}/sectores/{idSector}")
 	@ResponseStatus(code = HttpStatus.OK)
-	public ApiResponse<SectorDto> getSector(
+	public ApiResponse<SectorRootDto> getSector(
 			@PathVariable(name = "idEscuela") @NotNull Long idEscuela,
 			@PathVariable(name = "idSector") @NotNull Long idSector) throws ServiceException {
-		return new ApiResponse<>(toDto(escuelaService.getSector(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
+		return new ApiResponse<>(toRootDto(escuelaService.getSector(idEscuela, idSector)), ApiResponseStatus.SUCCESS);
 	}
 
 	/**

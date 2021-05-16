@@ -9,6 +9,8 @@ public class FiltroZonas {
 
 	private Boolean conEscuelas;
 
+	private Boolean todas;
+
 	public FiltroZonas() {
 		super();
 	}
@@ -27,6 +29,14 @@ public class FiltroZonas {
 
 	public void setConEscuelas(Boolean conEscuelas) {
 		this.conEscuelas = conEscuelas;
+	}
+
+	public Boolean getTodas() {
+		return todas;
+	}
+
+	public void setTodas(Boolean todas) {
+		this.todas = todas;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -30,11 +31,13 @@ public class Zona implements Serializable, RecursoLogeable {
 	private Long id;
 
 	@PaisIso
+	@Column(nullable = false)
 	private String pais;
 
 	@NotEmpty
 	private String region;
 	
+	@Column(length = 2000)
 	private String informacion;
 
 	@Formula("(select count(*)" +
@@ -48,6 +51,8 @@ public class Zona implements Serializable, RecursoLogeable {
 	private Integer numeroVias;
 	
 	private Boolean visible;
+	
+	private String enlaceImagen;
 	
 	@OrderBy("nombre")
 	@OneToMany(mappedBy = "zona")
@@ -119,6 +124,14 @@ public class Zona implements Serializable, RecursoLogeable {
 
 	public void setVisible(Boolean visible) {
 		this.visible = visible;
+	}
+
+	public String getEnlaceImagen() {
+		return enlaceImagen;
+	}
+
+	public void setEnlaceImagen(String enlaceImagen) {
+		this.enlaceImagen = enlaceImagen;
 	}
 
 	@Override
