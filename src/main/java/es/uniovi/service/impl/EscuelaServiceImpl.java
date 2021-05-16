@@ -477,6 +477,14 @@ public class EscuelaServiceImpl implements EscuelaService {
 		checkPrivilegioEscritura();
 		Escuela escuela = doGetEscuela(id);
 		escuela.setNombre(escuela2.getNombre());
+		escuela.setInformacion(escuela2.getInformacion());
+		// Controlo que se haya podido cambiar de zona...
+		if (escuela2.getZona() != null && escuela2.getZona().getId() != null) {
+			Zona nuevaZona = zonaRepository.findById(escuela2.getZona().getId()).orElseThrow();
+			if (!escuela.getZona().equals(nuevaZona)) {
+				escuela.setZona(nuevaZona);
+			}
+		}
 		logModificaciones(escuela, AccionLog.ACTUALIZAR);
 		return escuelaRepository.save(escuela);
 	}

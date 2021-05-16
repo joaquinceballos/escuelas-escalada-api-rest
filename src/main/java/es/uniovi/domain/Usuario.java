@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -34,12 +35,16 @@ public class Usuario implements Serializable, RecursoLogeable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
+	@Column(nullable = false)
 	private String nombre;
-	
+
+	@Column(nullable = false)
 	private String password;
-	
+
+	@Column(nullable = false)
 	private String email;
-	
+
+	@Column(nullable = false)
 	private String username;
 	
 	private String apellido1;

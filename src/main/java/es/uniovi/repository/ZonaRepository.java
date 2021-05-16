@@ -28,7 +28,7 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 	Integer countEscuelasById(Long id);
 
 	/**
-	 * Recupera las zonas visibles filtrando por país
+	 * Recupera las zonas <b>visibles</b> filtrando por país
 	 * 
 	 * @param pageable Parámetros de paginación
 	 * @param pais     El país
@@ -37,7 +37,16 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 	Page<Zona> findAllByPaisAndVisibleTrue(String pais, Pageable pageable);
 
 	/**
-	 * Recupera las zonas visibles filtrando por país y número de escuelas mayor al
+	 * Recupera las zonas filtrando por país
+	 * 
+	 * @param pageable Parámetros de paginación
+	 * @param pais     El país
+	 * @return Las zonas
+	 */
+	Page<Zona> findAllByPais(String pais, Pageable pageable);
+	
+	/**
+	 * Recupera las zonas <b>visibles</b> filtrando por país y número de escuelas mayor al
 	 * pasado
 	 * 
 	 * @param pageable       Parámetros de paginación
@@ -49,9 +58,20 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 			String pais,
 			Integer numeroEscuelas,
 			Pageable pageable);
+	
+	/**
+	 * Recupera las zonas filtrando por país y número de escuelas mayor al
+	 * pasado
+	 * 
+	 * @param pageable       Parámetros de paginación
+	 * @param numeroEscuelas El número de escuelas (normalmente 0)
+	 * @param pais           El país
+	 * @return Las zonas
+	 */	
+	Page<Zona> findAllByPaisAndNumeroEscuelasGreaterThan(String pais, int i, Pageable pageable);
 
 	/**
-	 * Recupera las zonas visibles filtrando por número de escuelas mayor al pasado
+	 * Recupera las zonas <b>visibles</b> filtrando por número de escuelas mayor al pasado
 	 * 
 	 * @param numeroEscuelas El número de escuelas (normalmente 0)
 	 * @param pageable       Parámetros de paginación
@@ -60,7 +80,16 @@ public interface ZonaRepository extends PagingAndSortingRepository<Zona, Long> {
 	Page<Zona> findByNumeroEscuelasGreaterThanAndVisibleTrue(Integer numeroEscuelas, Pageable pageable);
 
 	/**
-	 * Recupera las zonas visibles
+	 * Recupera las zonas filtrando por número de escuelas mayor al pasado
+	 * 
+	 * @param numeroEscuelas El número de escuelas (normalmente 0)
+	 * @param pageable       Parámetros de paginación
+	 * @return Las zonas
+	 */
+	Page<Zona> findByNumeroEscuelasGreaterThan(int i, Pageable pageable);
+	
+	/**
+	 * Recupera las zonas <b>visibles</b>
 	 * 
 	 * @param pageable Parámetros de paginación
 	 * @return Las zonas
