@@ -246,6 +246,10 @@ public abstract class BaseController {
 	protected SectorDto toDto(Sector sector) {
 		return modelMapper.map(sector, SectorDto.class);
 	}
+	
+	protected SectorRootDto toRootDto(Sector sector) {
+		return modelMapper.map(sector, SectorRootDto.class);
+	}
 
 	protected Sector toEntity(SectorDto sectorDto) {
 		return modelMapper.map(sectorDto, Sector.class);

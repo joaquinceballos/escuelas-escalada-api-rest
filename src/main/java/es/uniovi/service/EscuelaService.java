@@ -3,10 +3,14 @@ package es.uniovi.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.github.fge.jsonpatch.JsonPatch;
 
+import es.uniovi.domain.Ascension;
 import es.uniovi.domain.CierreTemporada;
 import es.uniovi.domain.Croquis;
 import es.uniovi.domain.Escuela;
@@ -236,7 +240,26 @@ public interface EscuelaService {
 	 * @param idCroquis El id el croquis
 	 * @throws NoAutorizadoException 
 	 */
-	void deleteCroquis(Long idEscuela, Long idSector, Long idCroquis) throws NoEncontradoException, NoAutorizadoException;
+	void deleteCroquis(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis) throws NoEncontradoException, NoAutorizadoException;
+
+	/**
+	 * Actualiza el tipo de leyendda para el croquis pasado
+	 * 
+	 * @param idEscuela   La id de la escuela
+	 * @param idSector    La id del sector
+	 * @param idCroquis   La id del croquis
+	 * @param tipoLeyenda El tipo de leyenda
+	 * @throws NoAutorizadoException 
+	 * @throws NoEncontradoException 
+	 */
+	void actualizaTipoLeyenda(
+			Long idEscuela,
+			Long idSector,
+			Long idCroquis,
+			String tipoLeyenda) throws NoAutorizadoException, NoEncontradoException;
 
 	/**
 	 * Añade nuevo trazo de vía al croquis
@@ -308,5 +331,21 @@ public interface EscuelaService {
 	 * @param idCierre  El id del cierre
 	 */
 	void deleteCierre(Long idEscuela, Long idCierre) throws ServiceException;
+
+	/**
+	 * Obtiene la página de ascensiones de la vía pasada.
+	 * 
+	 * @param idEscuela La id de la escuela
+	 * @param idSector  La id del sector
+	 * @param idVia     La id de la vía
+	 * @param pageable  Los parámetros de paginación
+	 * @return Las ascenciones
+	 * @throws NoEncontradoException 
+	 */
+	Page<Ascension> getAscencionesVia(
+			Long idEscuela,
+			Long idSector,
+			Long idVia,
+			Pageable pageable) throws NoEncontradoException;
 
 }

@@ -135,7 +135,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	private Usuario doGetUsuario(Long id) throws NoEncontradoException {
 		Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new NoEncontradoException("usuario.id", id));
-		usuario.setPassword(null);
 		return usuario;
 	}
 

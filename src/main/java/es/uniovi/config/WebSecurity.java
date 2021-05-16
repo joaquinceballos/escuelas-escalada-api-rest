@@ -85,7 +85,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.antMatchers(HttpMethod.DELETE, "/zonas/**").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.PUT, "/zonas/**").hasRole(Constantes.ROLE_ADMIN)
 			.antMatchers(HttpMethod.POST, "/zonas").hasRole(Constantes.ROLE_ADMIN)
-			.antMatchers(HttpMethod.GET, "/zonas/*").hasRole(Constantes.ROLE_ADMIN)
+			.antMatchers(HttpMethod.GET, "/zonas/todas").hasRole(Constantes.ROLE_ADMIN)
 			.anyRequest().authenticated()			
 			.and()
 			.exceptionHandling()

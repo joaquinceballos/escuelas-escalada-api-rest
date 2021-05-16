@@ -14,7 +14,6 @@ import es.uniovi.domain.RecursoLogeable;
 import es.uniovi.domain.Zona;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
-import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.exception.ServiceException;
 import es.uniovi.filtro.FiltroZonas;
@@ -40,6 +39,28 @@ public class ZonaServiceImpl implements ZonaService {
 	@Override
 	public Page<Zona> getZonas(Pageable pageable, FiltroZonas filtro) throws NoAutorizadoException {
 		checkPrivilegioLectura();
+		return Boolean.TRUE.equals(filtro.getTodas())
+				? getZonasTodas(pageable, filtro)
+				: getZonasVisibles(pageable, filtro);
+	}
+
+	private Page<Zona> getZonasTodas(Pageable pageable, FiltroZonas filtro) {
+		if (filtro.getPais() != null) {
+			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
+				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThan(filtro.getPais(), 0, pageable);
+			} else {
+				return zonaRepository.findAllByPais(filtro.getPais(), pageable);
+			}
+		} else {
+			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
+				return zonaRepository.findByNumeroEscuelasGreaterThan(0, pageable);
+			} else {
+				return zonaRepository.findAll(pageable);
+			}
+		}
+	}
+
+	private Page<Zona> getZonasVisibles(Pageable pageable, FiltroZonas filtro) {
 		if (filtro.getPais() != null) {
 			if (Boolean.TRUE.equals(filtro.getConEscuelas())) {
 				return zonaRepository.findAllByPaisAndNumeroEscuelasGreaterThanAndVisibleTrue(filtro.getPais(), 0, pageable);
@@ -64,7 +85,7 @@ public class ZonaServiceImpl implements ZonaService {
 	public Zona addZona(Zona zona) throws RestriccionDatosException, NoAutorizadoException {
 		checkPrivilegioEscritura();
 		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
-			throw new RecursoYaExisteException(zona.getPais() + "/" + zona.getRegion());
+			throw new RestriccionDatosException("Zona ya existe");
 		}
 		Zona savedZona = zonaRepository.save(zona);
 		logModificaciones(zona, AccionLog.CREAR);
@@ -84,12 +105,18 @@ public class ZonaServiceImpl implements ZonaService {
 	@Override
 	public Zona actualizaZona(Long id, Zona zona) throws ServiceException {
 		checkPrivilegioEscritura();
-		if (zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
-			throw new RecursoYaExisteException(zona.getPais() + "/" + zona.getRegion());
-		}
 		Zona persistida = doGetZona(id);
+		if (!persistida.getPais().equals(zona.getPais())
+				&& zonaRepository.existsByPaisAndRegion(zona.getPais(), zona.getRegion())) {
+			// si se quiere cambiar la zona de país comprobamos que no exista ya una zona
+			// con los mismos datos
+			throw new RestriccionDatosException("Zona ya existe");
+		}
 		persistida.setPais(zona.getPais());
 		persistida.setRegion(zona.getRegion());
+		persistida.setInformacion(zona.getInformacion());
+		persistida.setVisible(zona.isVisible());
+		persistida.setEnlaceImagen(zona.getEnlaceImagen());
 		logModificaciones(persistida, AccionLog.ACTUALIZAR);
 		return zonaRepository.save(persistida);
 	}

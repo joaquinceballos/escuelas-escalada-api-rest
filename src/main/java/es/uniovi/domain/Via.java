@@ -3,6 +3,7 @@ package es.uniovi.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
@@ -48,6 +50,9 @@ public class Via implements Serializable, RecursoLogeable {
 
 	@Min(0)
 	private Double longitud;
+	
+	@Column(length = 2000)
+	private String informacion;
 
 	@JsonIgnore
 	@ManyToOne(optional = false)
@@ -128,6 +133,14 @@ public class Via implements Serializable, RecursoLogeable {
 
 	public void setTrazos(List<TrazoVia> trazos) {
 		this.trazos = trazos;
+	}
+
+	public String getInformacion() {
+		return informacion;
+	}
+
+	public void setInformacion(String informacion) {
+		this.informacion = informacion;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -19,6 +20,7 @@ import javax.persistence.UniqueConstraint;
 
 import es.uniovi.domain.LogModificaciones.TipoRecurso;
 import es.uniovi.dto.CroquisDto;
+import es.uniovi.validation.ValueOfEnum;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "sector", "nombre" }, name = "UQ_CROQUIS_NOMBRE"))
@@ -47,6 +49,10 @@ public class Croquis implements Serializable, RecursoLogeable {
 	private String nombre;
 	
 	private String formatoImagen;
+	
+	@Column(nullable = false)
+	@ValueOfEnum(enumClass = TipoLeyenda.class)
+	private String tipoLeyenda;
 
 	public Croquis() {
 		super();
@@ -100,6 +106,14 @@ public class Croquis implements Serializable, RecursoLogeable {
 		this.formatoImagen = formatoImagen;		
 	}
 	
+	public String getTipoLeyenda() {
+		return tipoLeyenda;
+	}
+
+	public void setTipoLeyenda(String tipoLeyenda) {
+		this.tipoLeyenda = tipoLeyenda;
+	}
+
 	@Override
 	public String toString() {
 		return "Croquis [id=" + id + ", sector=" + sector + ", nombre=" + nombre + "]";
