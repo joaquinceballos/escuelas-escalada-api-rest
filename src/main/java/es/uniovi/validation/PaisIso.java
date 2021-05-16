@@ -16,7 +16,7 @@ import es.uniovi.validation.validators.PaisIsoValidator;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PaisIsoValidator.class)
 public @interface PaisIso {
-	String message() default "Código de país no es válido (ISO 3166)";
+	String message() default "{error.pais-iso}";
 
 	Class<?>[] groups() default {};
 

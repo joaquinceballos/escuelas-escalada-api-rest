@@ -48,6 +48,7 @@ import es.uniovi.domain.Sector;
 import es.uniovi.domain.Usuario;
 import es.uniovi.domain.Via;
 import es.uniovi.exception.NoEncontradoException;
+import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.repository.EscuelaRepository;
 import es.uniovi.repository.PrivilegioRepository;
@@ -398,7 +399,7 @@ class TestEscuelaService {
 		assertThat(via2.getLongitud()).isEqualTo(10.0);
 
 		// salta excepción cuando se intenta añadir vía con nombre que ya existe
-		assertThrows(TransactionSystemException.class,
+		assertThrows(RecursoYaExisteException.class,
 				() -> escuelaService.addVia(escuela.getId(), sector.getId(), nuevaVia("via1", "", null, null)));
 
 		// salta excepción cuando se intenta añadir vía no válida

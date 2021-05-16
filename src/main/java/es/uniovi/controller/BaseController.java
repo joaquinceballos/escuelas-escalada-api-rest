@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +64,7 @@ import es.uniovi.exception.ImagenNoValidaException;
 import es.uniovi.exception.NoAutorizadoException;
 import es.uniovi.exception.NoEncontradoException;
 import es.uniovi.exception.PatchInvalidoException;
+import es.uniovi.exception.RecursoYaExisteException;
 import es.uniovi.exception.RestriccionDatosException;
 import es.uniovi.service.ImagenService;
 
@@ -75,6 +77,9 @@ public abstract class BaseController {
 	
 	@Autowired
 	private ImagenService imagenService;
+	
+	@Autowired
+	private MessageSource messageSource;
 
 	///////////////////////////////
 	//// manejo de excepciones ////
@@ -82,41 +87,40 @@ public abstract class BaseController {
 
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-	protected ApiResponse<Void> handleException(Exception e) throws Exception {
+	protected ApiResponse<Void> handleException(Exception e, Locale locale) throws Exception {
 		logger.error(e);
-		return new ApiResponse<>("Error general del servidor", Constantes.ERROR_INTERNO);
+		String message = messageSource.getMessage("error.server-error", null, locale);
+		return new ApiResponse<>(message, Constantes.ERROR_INTERNO);
 	}
 	
 	@ExceptionHandler(BindException.class)
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-	protected ApiResponse<Map<String, String>> handleException(BindException e) {
+	protected ApiResponse<List<String>> handleException(BindException e) {
 		return getObjectErrors(e);
 	}
 
-	private ApiResponse<Map<String, String>> getObjectErrors(BindException e) {
-		Map<String, String> errors = new HashMap<>();
-		e.getBindingResult().getAllErrors().forEach(error -> {
-			if (error instanceof FieldError) {
-				String fieldName = ((FieldError) error).getField();
-				String errorMessage = error.getDefaultMessage();
-				errors.put(fieldName, errorMessage);
-			} else {
-				ObjectError objectError = error;
-				String objectName = objectError.getObjectName();
-				String errorMessage = objectError.getDefaultMessage();
-				errors.put(objectName, errorMessage);
-				logger.info(error.getClass());
-			}
-		});
+	private ApiResponse<List<String>> getObjectErrors(BindException e) {
+		List<String> errors = e
+				.getBindingResult()
+				.getAllErrors()
+				.stream()
+				.map(objectError -> objectError.getDefaultMessage()
+						+ (objectError instanceof FieldError 
+								? ": " + ((FieldError) objectError).getRejectedValue()
+								: "")
+				)
+				.collect(Collectors.toList());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
 	
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-	protected ApiResponse<Map<String, String>> handleException(MissingServletRequestParameterException e) {
-		Map<String, String> errors = new HashMap<>();
-		errors.put("error", "Parámetro obligatorio no informado: " + e.getParameterName());
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	protected ApiResponse<String> handleException(MissingServletRequestParameterException e, Locale locale) {
+		String message = messageSource.getMessage(
+				"error.parametro-obligatorio",
+				new Object[] { e.getParameterName() },
+				locale);
+		return new ApiResponse<>(message, ApiResponseStatus.FAIL);
 	}
 
 	@ExceptionHandler(RestriccionDatosException.class)
@@ -126,28 +130,35 @@ public abstract class BaseController {
 		errors.put("error", e.getMessage());
 		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
 	}
+	
+	@ExceptionHandler(RecursoYaExisteException.class)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	protected ApiResponse<String> handleException(RecursoYaExisteException e, Locale locale) {
+		String message = messageSource.getMessage("error.recurso-ya-existe", new Object[] { e.getRecurso() }, locale);
+		return new ApiResponse<>(message, ApiResponseStatus.FAIL);
+	}
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	protected ApiResponse<Map<String, String>> handleException(MethodArgumentNotValidException e) {
+	protected ApiResponse<List<String>> handleException(MethodArgumentNotValidException e) {
 		return getObjectErrors(e);
 	}
 
 	@ResponseStatus(code = HttpStatus.NOT_FOUND)
 	@ExceptionHandler(NoEncontradoException.class)
-	protected ApiResponse<Map<String, Object>> handleException(NoEncontradoException e) {
-		Map<String, Object> errors = new HashMap<>();
-		errors.put("recurso", e.getRecurso());
-		errors.put("valor", e.getValor());
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	protected ApiResponse<String> handleException(NoEncontradoException e, Locale locale) {
+		String message = messageSource.getMessage(
+				"error.no-encontrado",
+				new Object[] { e.getRecurso(), e.getValor() },
+				locale);
+		return new ApiResponse<>(message, ApiResponseStatus.FAIL);
 	}
 	
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(ImagenNoValidaException.class)
-	protected ApiResponse<Map<String, Object>> handleException(ImagenNoValidaException e) {
-		Map<String, Object> errors = new HashMap<>();
-		errors.put("imagen no válida", e.getMessage());
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);
+	protected ApiResponse<String> handleException(ImagenNoValidaException e, Locale locale) {
+		String message = messageSource.getMessage("error.imagen", null, locale);
+		return new ApiResponse<>(message, ApiResponseStatus.FAIL);
 	}
 	
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
@@ -200,9 +211,9 @@ public abstract class BaseController {
 	
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	@ExceptionHandler(NoAutorizadoException.class)
-	protected ApiResponse<Map<String, Object>> handleException(NoAutorizadoException e) {
-		Map<String, Object> errors = Collections.singletonMap("error", "No autorizado");
-		return new ApiResponse<>(errors, ApiResponseStatus.FAIL);		
+	protected ApiResponse<String> handleException(NoAutorizadoException e, Locale locale) {
+		String message = messageSource.getMessage("error.no-autorizado", null, locale);
+		return new ApiResponse<>(message, ApiResponseStatus.FAIL);
 	}
 	
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)

@@ -17,7 +17,7 @@ import es.uniovi.validation.validators.PeriodoFechasValidator;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PeriodoFechasValidator.class)
 public @interface PeriodoFechas {
-	String message() default "Periodo de fechas no válido";
+	String message() default "{error.validation.fechas}";
 
 	Class<?>[] groups() default {};
 
