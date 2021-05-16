@@ -69,12 +69,7 @@ class TestEscuelaController {
 		MockitoAnnotations.openMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(escuelaController).build();
 		ReflectionTestUtils.setField(escuelaController, "modelMapper", new ModelMapper());
-		Mockito
-			.when(messageSource.getMessage(
-				ArgumentMatchers.anyString(),
-				ArgumentMatchers.any(Object[].class),
-				ArgumentMatchers.any()))
-			.thenReturn("mensaje");
+
 	}
 
 	/**
@@ -228,6 +223,12 @@ class TestEscuelaController {
 	@Test
 	void testGetEscuelaFail2() throws Exception {
 		Mockito.when(escuelaService.getEscuela(1l)).thenThrow(NoEncontradoException.class);
+		Mockito
+			.when(messageSource.getMessage(
+				ArgumentMatchers.anyString(),
+				ArgumentMatchers.any(Object[].class),
+				ArgumentMatchers.any()))
+			.thenReturn("mensaje");
 		mockMvc.perform(get("/escuelas/1"))
 				.andExpect(status().is4xxClientError())
 				.andExpect(jsonPath("$.status", is("FAIL")))
