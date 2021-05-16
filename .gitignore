@@ -14,3 +14,10 @@ target/
 .sts4-cache
 .mvn/
 /mvnw*
+.dbeaver/
+Scripts/
+
+### lucene ###
+Escuela/
+Sector/
+Via/
