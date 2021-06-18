@@ -27,12 +27,19 @@ public class ApiAnalyzer extends Analyzer {
 		result = new LowerCaseFilter(result);
 		result = new StopFilter(result, EnglishAnalyzer.getDefaultStopSet());
 		result = new StopFilter(result, SpanishAnalyzer.getDefaultStopSet());
-		CharArraySet charArraySet = new CharArraySet(Arrays.asList("escalada"), true);
+		CharArraySet charArraySet = new CharArraySet(palabrasVaciasGeneral(), true);
 		charArraySet.addAll(palabrasVaciasEspecificas());
-		result = new StopFilter(result, charArraySet);		
+		result = new StopFilter(result, charArraySet);
 		result = new PorterStemFilter(result);
 		result = new CapitalizationFilter(result);
 		return new TokenStreamComponents(src, result);
+	}
+
+	/**
+	 * @return Colección de palabras vacías aplicables a todos los ApiAnalyzer
+	 */
+	private Collection<String> palabrasVaciasGeneral() {
+		return Arrays.asList("escalada", "escuela", "escuelas", "sector", "sectores", "vía", "vías");
 	}
 
 	/**
